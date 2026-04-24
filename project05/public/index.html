@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中文拼音转换工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .input-section {
+      margin-bottom: 40px;
+    }
+    
+    .input-section h2 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+      display: inline-block;
+    }
+    
+    .upload-area {
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      background: #f8f9ff;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    
+    .upload-area:hover {
+      border-color: #764ba2;
+      background: #f0f2ff;
+    }
+    
+    .upload-area.dragover {
+      border-color: #764ba2;
+      background: #e8ebff;
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    
+    .upload-text {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    
+    .upload-hint {
+      font-size: 0.9rem;
+      color: #999;
+    }
+    
+    #fileInput {
+      display: none;
+    }
+    
+    .text-input-area {
+      margin-top: 30px;
+    }
+    
+    .text-input-area textarea {
+      width: 100%;
+      height: 150px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+    }
+    
+    .text-input-area textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .btn-secondary:hover {
+      box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+    
+    .btn-danger:hover {
+      box-shadow: 0 10px 20px rgba(235, 51, 73, 0.3);
+    }
+    
+    .result-section {
+      margin-top: 40px;
+    }
+    
+    .result-section h2 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+      display: inline-block;
+    }
+    
+    .result-container {
+      background: #f8f9ff;
+      border-radius: 15px;
+      padding: 30px;
+      min-height: 200px;
+      border: 2px solid #e8ebff;
+    }
+    
+    .result-text {
+      font-size: 1.3rem;
+      line-height: 2.5;
+      color: #333;
+      word-break: break-all;
+    }
+    
+    .pinyin-wrapper {
+      display: inline-block;
+      text-align: center;
+      margin: 0 3px;
+    }
+    
+    .pinyin {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 2px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .char {
+      font-size: 1.5rem;
+      display: block;
+    }
+    
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 40px;
+    }
+    
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+    
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .file-info {
+      background: #e8ebff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .file-info.show {
+      display: block;
+    }
+    
+    .file-name {
+      font-weight: 600;
+      color: #667eea;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .loading.show {
+      display: block;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      background: #fff5f5;
+      color: #c53030;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border-left: 4px solid #c53030;
+      display: none;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 30px 0;
+      color: #999;
+      font-size: 0.9rem;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '—';
+      margin: 0 10px;
+    }
+    
+    .loading-text {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .loading-hint {
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📝 中文拼音转换工具</h1>
+      <p>上传txt文件、图片或直接输入文字，自动添加拼音，支持导出PDF</p>
+    </div>
+    
+    <div class="content">
+      <div class="input-section">
+        <h2>输入方式</h2>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">点击或拖拽上传txt文件</div>
+          <div class="upload-hint">支持 .txt 格式文件</div>
+        </div>
+        
+        <input type="file" id="fileInput" accept=".txt">
+        
+        <div class="divider">或者上传图片识别文字</div>
+        
+        <div class="upload-area" id="imageUploadArea">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text">点击或拖拽上传图片</div>
+          <div class="upload-hint">支持 .jpg, .png, .jpeg, .bmp, .tiff 格式图片</div>
+        </div>
+        
+        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.bmp,.tiff">
+        
+        <div class="file-info" id="imageFileInfo">
+          <span>已选择图片：</span>
+          <span class="file-name" id="imageFileName"></span>
+        </div>
+        
+        <div class="file-info" id="fileInfo">
+          <span>已选择文件：</span>
+          <span class="file-name" id="fileName"></span>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn" id="uploadBtn" disabled>转换文件</button>
+          <button class="btn btn-danger" id="clearFileBtn" disabled>清除文件</button>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn" id="imageUploadBtn" disabled>识别图片并转换</button>
+          <button class="btn btn-danger" id="clearImageBtn" disabled>清除图片</button>
+        </div>
+        
+        <div class="divider">或者直接输入文字</div>
+        
+        <div class="text-input-area">
+          <textarea id="textInput" placeholder="请在这里输入中文文字..."></textarea>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn btn-secondary" id="textConvertBtn" disabled>转换文字</button>
+          <button class="btn btn-danger" id="clearTextBtn" disabled>清除文字</button>
+        </div>
+      </div>
+      
+      <div class="result-section">
+        <h2>转换结果</h2>
+        
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <div class="loading-text" id="loadingText">正在处理中...</div>
+          <div class="loading-hint" id="loadingHint"></div>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+          <div class="empty-state">
+            <div class="icon">📝</div>
+            <div>转换后的拼音文字将在这里显示</div>
+          </div>
+        </div>
+        
+        <div class="button-group" id="exportButtons" style="display: none;">
+          <button class="btn btn-secondary" id="exportPdfBtn">📑 导出 PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let currentResult = null;
+    
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const imageUploadBtn = document.getElementById('imageUploadBtn');
+    const clearImageBtn = document.getElementById('clearImageBtn');
+    const imageFileInfo = document.getElementById('imageFileInfo');
+    const imageFileName = document.getElementById('imageFileName');
+    
+    const textInput = document.getElementById('textInput');
+    const textConvertBtn = document.getElementById('textConvertBtn');
+    const clearTextBtn = document.getElementById('clearTextBtn');
+    
+    const resultContainer = document.getElementById('resultContainer');
+    const loading = document.getElementById('loading');
+    const loadingText = document.getElementById('loadingText');
+    const loadingHint = document.getElementById('loadingHint');
+    const errorMessage = document.getElementById('errorMessage');
+    const exportButtons = document.getElementById('exportButtons');
+    
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
+    
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileSelect(files[0]);
+      }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+    
+    imageUploadArea.addEventListener('click', () => {
+      imageInput.click();
+    });
+    
+    imageUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      imageUploadArea.classList.add('dragover');
+    });
+    
+    imageUploadArea.addEventListener('dragleave', () => {
+      imageUploadArea.classList.remove('dragover');
+    });
+    
+    imageUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imageUploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleImageSelect(files[0]);
+      }
+    });
+    
+    imageInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleImageSelect(e.target.files[0]);
+      }
+    });
+    
+    function handleFileSelect(file) {
+      if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
+        showError('请上传txt格式的文件');
+        return;
+      }
+      
+      fileName.textContent = file.name;
+      fileInfo.classList.add('show');
+      uploadBtn.disabled = false;
+      clearFileBtn.disabled = false;
+      hideError();
+    }
+    
+    function handleImageSelect(file) {
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/bmp', 'image/tiff'];
+      const validExtensions = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff'];
+      
+      const isValidType = validImageTypes.includes(file.type);
+      const isValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+      
+      if (!isValidType && !isValidExtension) {
+        showError('请上传支持的图片格式（jpg, jpeg, png, bmp, tiff）');
+        return;
+      }
+      
+      imageFileName.textContent = file.name;
+      imageFileInfo.classList.add('show');
+      imageUploadBtn.disabled = false;
+      clearImageBtn.disabled = false;
+      hideError();
+    }
+    
+    textInput.addEventListener('input', () => {
+      const hasText = textInput.value.trim().length > 0;
+      textConvertBtn.disabled = !hasText;
+      clearTextBtn.disabled = !hasText;
+    });
+    
+    uploadBtn.addEventListener('click', async () => {
+      if (!fileInput.files.length) {
+        showError('请先选择文件');
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      showLoading();
+      hideError();
+      
+      try {
+        const response = await fetch('/api/convert', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          currentResult = result.data;
+          displayResult(result.data);
+          exportButtons.style.display = 'flex';
+        } else {
+          showError(result.error || '转换失败');
+        }
+      } catch (error) {
+        showError('网络错误，请稍后重试');
+        console.error(error);
+      } finally {
+        hideLoading();
+      }
+    });
+    
+    imageUploadBtn.addEventListener('click', async () => {
+      if (!imageInput.files.length) {
+        showError('请先选择图片');
+        return;
+      }
+      
+      const file = imageInput.files[0];
+      
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showError('图片大小不能超过10MB，请压缩后重试');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      showLoading('正在识别图片文字...', '首次使用需要下载语言包，请耐心等待（可能需要30秒-2分钟）');
+      hideError();
+      
+      try {
+        console.log('开始上传图片进行识别...');
+        
+        const response = await fetch('/api/recognize-image', {
+          method: 'POST',
+          body: formData
+        });
+        
+        console.log('收到响应，状态码:', response.status);
+        
+        const result = await response.json();
+        console.log('响应数据:', result);
+        
+        if (response.ok) {
+          currentResult = result.data;
+          displayResult(result.data);
+          exportButtons.style.display = 'flex';
+        } else {
+          showError(result.error || '图片识别失败');
+        }
+      } catch (error) {
+        console.error('图片识别错误:', error);
+        showError('请求失败：' + error.message + '，请检查网络连接后重试');
+      } finally {
+        hideLoading();
+      }
+    });
+    
+    textConvertBtn.addEventListener('click', async () => {
+      const text = textInput.value.trim();
+      
+      if (!text) {
+        showError('请输入文字');
+        return;
+      }
+      
+      showLoading();
+      hideError();
+      
+      try {
+        const response = await fetch('/api/convert-text', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          currentResult = result.data;
+          displayResult(result.data);
+          exportButtons.style.display = 'flex';
+        } else {
+          showError(result.error || '转换失败');
+        }
+      } catch (error) {
+        showError('网络错误，请稍后重试');
+        console.error(error);
+      } finally {
+        hideLoading();
+      }
+    });
+    
+    clearFileBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      fileInfo.classList.remove('show');
+      fileName.textContent = '';
+      uploadBtn.disabled = true;
+      clearFileBtn.disabled = true;
+    });
+    
+    clearImageBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      imageFileInfo.classList.remove('show');
+      imageFileName.textContent = '';
+      imageUploadBtn.disabled = true;
+      clearImageBtn.disabled = true;
+    });
+    
+    clearTextBtn.addEventListener('click', () => {
+      textInput.value = '';
+      textConvertBtn.disabled = true;
+      clearTextBtn.disabled = true;
+    });
+    
+    exportPdfBtn.addEventListener('click', async () => {
+      if (!currentResult) {
+        showError('没有可导出的内容');
+        return;
+      }
+      
+      showLoading();
+      hideError();
+      
+      try {
+        const response = await fetch('/api/export-pdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ textWithPinyin: currentResult })
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'pinyin-text.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        } else {
+          const result = await response.json();
+          showError(result.error || '导出失败');
+        }
+      } catch (error) {
+        showError('网络错误，请稍后重试');
+        console.error(error);
+      } finally {
+        hideLoading();
+      }
+    });
+    
+    function displayResult(data) {
+      let html = '<div class="result-text">';
+      
+      for (const item of data) {
+        if (item.text === '\n') {
+          html += '<br>';
+        } else if (item.pinyin) {
+          html += `
+            <span class="pinyin-wrapper">
+              <span class="pinyin">${item.pinyin}</span>
+              <span class="char">${item.text}</span>
+            </span>
+          `;
+        } else {
+          html += `<span>${item.text}</span>`;
+        }
+      }
+      
+      html += '</div>';
+      resultContainer.innerHTML = html;
+    }
+    
+    function showLoading(text, hint) {
+      loadingText.textContent = text || '正在处理中...';
+      loadingHint.textContent = hint || '';
+      loading.classList.add('show');
+    }
+    
+    function hideLoading() {
+      loading.classList.remove('show');
+      loadingText.textContent = '正在处理中...';
+      loadingHint.textContent = '';
+    }
+    
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+    }
+    
+    function hideError() {
+      errorMessage.classList.remove('show');
+    }
+  </script>
+</body>
+</html>

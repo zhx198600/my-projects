@@ -1,0 +1,85 @@
+{
+  "books": [
+    {
+      "id": "little_rabbit_adventure",
+      "title": "小兔子的冒险",
+      "coverImagePath": "assets/books/little_rabbit/cover.jpg",
+      "description": "一个关于勇气和友谊的故事，讲述小兔子如何在森林探险中结识新朋友，学会勇敢面对困难。",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "imagePath": "assets/books/little_rabbit/page1.jpg",
+          "text": "在一片美丽的森林里，住着一只可爱的小兔子。"
+        },
+        {
+          "pageNumber": 2,
+          "imagePath": "assets/books/little_rabbit/page2.jpg",
+          "text": "一天，小兔子决定去森林外面探险。"
+        },
+        {
+          "pageNumber": 3,
+          "imagePath": "assets/books/little_rabbit/page3.jpg",
+          "text": "它背着小背包，向妈妈挥手告别。"
+        },
+        {
+          "pageNumber": 4,
+          "imagePath": "assets/books/little_rabbit/page4.jpg",
+          "text": "在路上，小兔子遇到了一只迷路的小松鼠。"
+        },
+        {
+          "pageNumber": 5,
+          "imagePath": "assets/books/little_rabbit/page5.jpg",
+          "text": "小兔子帮助小松鼠找到了回家的路。"
+        },
+        {
+          "pageNumber": 6,
+          "imagePath": "assets/books/little_rabbit/page6.jpg",
+          "text": "从此，它们成为了最好的朋友，一起在森林里快乐地玩耍。"
+        }
+      ]
+    },
+    {
+      "id": "brave_little_turtle",
+      "title": "勇敢的小乌龟",
+      "coverImagePath": "assets/books/brave_turtle/cover.jpg",
+      "description": "小乌龟虽然行动缓慢，但它从不放弃，最终实现了自己的梦想。这是一个关于坚持和自信的故事。",
+      "pages": [
+        {
+          "pageNumber": 1,
+          "imagePath": "assets/books/brave_turtle/page1.jpg",
+          "text": "大海边住着一只小乌龟，它的名字叫慢慢。"
+        },
+        {
+          "pageNumber": 2,
+          "imagePath": "assets/books/brave_turtle/page2.jpg",
+          "text": "慢慢梦想着能游到大海中央的珊瑚岛去看看。"
+        },
+        {
+          "pageNumber": 3,
+          "imagePath": "assets/books/brave_turtle/page3.jpg",
+          "text": "朋友们都劝它：\"那里太远了，你游不到的。\""
+        },
+        {
+          "pageNumber": 4,
+          "imagePath": "assets/books/brave_turtle/page4.jpg",
+          "text": "但慢慢没有放弃，每天都努力练习游泳。"
+        },
+        {
+          "pageNumber": 5,
+          "imagePath": "assets/books/brave_turtle/page5.jpg",
+          "text": "终于有一天，慢慢踏上了去往珊瑚岛的旅程。"
+        },
+        {
+          "pageNumber": 6,
+          "imagePath": "assets/books/brave_turtle/page6.jpg",
+          "text": "经过漫长的旅程，慢慢终于看到了美丽的珊瑚岛。"
+        },
+        {
+          "pageNumber": 7,
+          "imagePath": "assets/books/brave_turtle/page7.jpg",
+          "text": "慢慢明白了：只要坚持梦想，就一定能实现！"
+        }
+      ]
+    }
+  ]
+}
