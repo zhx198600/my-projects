@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block title %}工单详情 - {{ ticket.ticket_no }} - OPPO 工单管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    .page-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+        color: white;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    }
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .card-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-header .count {
+        font-size: 13px;
+        color: #999;
+        font-weight: normal;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    .info-label {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 6px;
+    }
+    .info-value {
+        font-size: 14px;
+        color: #333;
+        font-weight: 500;
+    }
+    .info-value.empty {
+        color: #ccc;
+        font-weight: normal;
+    }
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .status-pending { background: #e3f2fd; color: #1565c0; }
+    .status-processing { background: #fff3e0; color: #ef6c00; }
+    .status-resolved { background: #e8f5e9; color: #2e7d32; }
+    .status-closed { background: #f5f5f5; color: #757575; }
+    .priority-low { background: #f5f5f5; color: #757575; }
+    .priority-medium { background: #e3f2fd; color: #1565c0; }
+    .priority-high { background: #fff3e0; color: #ef6c00; }
+    .priority-urgent { background: #ffebee; color: #c62828; }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #1a73e8;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .button-group {
+        display: flex;
+        gap: 10px;
+    }
+    .record-item {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+    .record-item:last-child {
+        margin-bottom: 0;
+    }
+    .record-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    .record-operator {
+        font-weight: 500;
+        color: #333;
+    }
+    .record-time {
+        font-size: 12px;
+        color: #999;
+    }
+    .record-content {
+        color: #555;
+        line-height: 1.6;
+    }
+    .transfer-arrow {
+        color: #1a73e8;
+        margin: 0 8px;
+    }
+    .field-change {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .field-name {
+        font-weight: 500;
+        color: #333;
+        min-width: 80px;
+    }
+    .old-val {
+        color: #999;
+        text-decoration: line-through;
+    }
+    .new-val {
+        color: #2e7d32;
+        font-weight: 500;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: #999;
+        font-size: 14px;
+    }
+    .ticket-no {
+        color: #1a73e8;
+        font-weight: 600;
+    }
+    .divider {
+        height: 1px;
+        background: #eee;
+        margin: 15px 0;
+    }
+</style>
+
+<a href="{% url 'ticket_list' %}" class="back-link">← 返回工单列表</a>
+
+<div class="page-header">
+    <h2>工单详情 <span class="ticket-no">{{ ticket.ticket_no }}</span></h2>
+    <div class="button-group">
+        <a href="{% url 'ticket_edit' ticket.pk %}" class="btn btn-primary">编辑工单</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">基本信息</div>
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">工单编号</span>
+            <span class="info-value ticket-no">{{ ticket.ticket_no }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">工单类型</span>
+            <span class="info-value">{{ ticket.ticket_type.name }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">工单状态</span>
+            <span class="info-value"><span class="badge status-{{ ticket.status }}">{{ ticket.get_status_display }}</span></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">紧急程度</span>
+            <span class="info-value"><span class="badge priority-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></span>
+        </div>
+        
+        <div class="divider" style="grid-column: 1 / -1;"></div>
+        
+        <div class="info-item">
+            <span class="info-label">用户姓名</span>
+            <span class="info-value {% if not ticket.user_name %}empty{% endif %}">{{ ticket.user_name|default:"-" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">联系电话</span>
+            <span class="info-value {% if not ticket.user_phone %}empty{% endif %}">{{ ticket.user_phone|default:"-" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">电子邮箱</span>
+            <span class="info-value {% if not ticket.user_email %}empty{% endif %}">{{ ticket.user_email|default:"-" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">工单来源</span>
+            <span class="info-value">{{ ticket.get_source_display }}</span>
+        </div>
+        
+        <div class="divider" style="grid-column: 1 / -1;"></div>
+        
+        <div class="info-item">
+            <span class="info-label">受理人</span>
+            <span class="info-value {% if not ticket.receiver %}empty{% endif %}">{{ ticket.receiver|default:"-" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">处理人</span>
+            <span class="info-value {% if not ticket.handler %}empty{% endif %}">{{ ticket.handler|default:"-" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">处理部门</span>
+            <span class="info-value {% if not ticket.handle_department %}empty{% endif %}">{{ ticket.handle_department|default:"-" }}</span>
+        </div>
+        <div class="info-item"></div>
+        
+        <div class="divider" style="grid-column: 1 / -1;"></div>
+        
+        <div class="info-item">
+            <span class="info-label">创建时间</span>
+            <span class="info-value">{{ ticket.created_at|date:"Y-m-d H:i" }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">更新时间</span>
+            <span class="info-value">{{ ticket.updated_at|date:"Y-m-d H:i" }}</span>
+        </div>
+        <div class="info-item"></div>
+        <div class="info-item"></div>
+    </div>
+</div>
+
+{% if custom_fields %}
+<div class="card">
+    <div class="card-header">
+        自定义字段
+        <span class="count">({{ ticket.ticket_type.name }})</span>
+    </div>
+    <div class="info-grid">
+        {% for field in custom_fields %}
+        <div class="info-item">
+            <span class="info-label">{{ field.field_name }}</span>
+            <span class="info-value {% if not field.value %}empty{% endif %}">{{ field.value|default:"-" }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if transfer_records %}
+<div class="card">
+    <div class="card-header">
+        转派记录
+        <span class="count">(共 {{ transfer_records|length }} 条)</span>
+    </div>
+    {% for record in transfer_records %}
+    <div class="record-item">
+        <div class="record-header">
+            <span class="record-operator">{{ record.operator }}</span>
+            <span class="record-time">{{ record.created_at|date:"Y-m-d H:i" }}</span>
+        </div>
+        <div class="record-content">
+            <div>
+                <strong>处理人：</strong>
+                <span class="{% if not record.from_handler %}old-val{% endif %}">{{ record.from_handler|default:"-" }}</span>
+                <span class="transfer-arrow">→</span>
+                <span class="{% if not record.to_handler %}empty{% endif %}">{{ record.to_handler|default:"-" }}</span>
+            </div>
+            <div style="margin-top: 6px;">
+                <strong>处理部门：</strong>
+                <span class="{% if not record.from_department %}old-val{% endif %}">{{ record.from_department|default:"-" }}</span>
+                <span class="transfer-arrow">→</span>
+                <span class="{% if not record.to_department %}empty{% endif %}">{{ record.to_department|default:"-" }}</span>
+            </div>
+            {% if record.transfer_reason %}
+            <div style="margin-top: 6px;">
+                <strong>转派原因：</strong>{{ record.transfer_reason }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-header">转派记录</div>
+    <div class="empty-state">暂无转派记录</div>
+</div>
+{% endif %}
+
+{% if edit_histories %}
+<div class="card">
+    <div class="card-header">
+        编辑历史
+        <span class="count">(共 {{ edit_histories|length }} 条)</span>
+    </div>
+    {% for history in edit_histories %}
+    <div class="record-item">
+        <div class="record-header">
+            <span class="record-operator">{{ history.operator }}</span>
+            <span class="record-time">{{ history.created_at|date:"Y-m-d H:i" }}</span>
+        </div>
+        <div class="record-content">
+            <div class="field-change">
+                <span class="field-name">{{ history.field_name }}</span>
+                <span class="old-val">{{ history.old_value|default:"-" }}</span>
+                <span class="transfer-arrow">→</span>
+                <span class="new-val">{{ history.new_value|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card">
+    <div class="card-header">编辑历史</div>
+    <div class="empty-state">暂无编辑历史</div>
+</div>
+{% endif %}
+{% endblock %}

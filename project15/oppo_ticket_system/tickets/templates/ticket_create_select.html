@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}新建工单 - OPPO 工单管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        margin-bottom: 30px;
+    }
+    .page-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .page-header p {
+        color: #666;
+        font-size: 14px;
+    }
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        padding: 30px;
+    }
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .ticket-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .ticket-type-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: block;
+    }
+    .ticket-type-card:hover {
+        border-color: #1a73e8;
+        background-color: #f0f7ff;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(26, 115, 232, 0.15);
+    }
+    .ticket-type-card h3 {
+        font-size: 18px;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    .ticket-type-card p {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 0;
+    }
+    .icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #1a73e8;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .field-count {
+        display: inline-block;
+        background: #e3f2fd;
+        color: #1565c0;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+</style>
+
+<a href="{% url 'ticket_list' %}" class="back-link">← 返回工单列表</a>
+
+<div class="page-header">
+    <h2>新建工单</h2>
+    <p>请选择工单类型</p>
+</div>
+
+<div class="card">
+    <div class="section-title">选择工单类型</div>
+    <div class="ticket-types">
+        {% for tt in ticket_types %}
+        <a href="{% url 'ticket_create' tt.code %}" class="ticket-type-card">
+            <div class="icon">{{ tt.icon }}</div>
+            <h3>{{ tt.name }}</h3>
+            <p>创建{{ tt.name }}类型工单</p>
+            {% if tt.custom_fields.all %}
+            <span class="field-count">{{ tt.custom_fields.all|length }} 个自定义字段</span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
