@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}新建工单 - {{ ticket_type.name }} - OPPO 工单管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+    .page-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    .form-group label .required {
+        color: #e53935;
+        margin-left: 3px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #1a73e8;
+    }
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .form-group .error {
+        color: #e53935;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    .form-group.has-error input,
+    .form-group.has-error select,
+    .form-group.has-error textarea {
+        border-color: #e53935;
+    }
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    .btn {
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+        color: white;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    }
+    .btn-secondary {
+        background: #f5f5f5;
+        color: #666;
+    }
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #1a73e8;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    .type-badge {
+        display: inline-block;
+        background: #e3f2fd;
+        color: #1565c0;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .help-text {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
+    }
+    .custom-field-textarea {
+        grid-column: span 2;
+    }
+    @media (max-width: 768px) {
+        .custom-field-textarea {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<a href="{% url 'ticket_create_select' %}" class="back-link">← 选择其他类型</a>
+
+<div class="page-header">
+    <h2>新建工单 <span class="type-badge">{{ ticket_type.name }}</span></h2>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="card">
+        <div class="card-title">基本信息</div>
+        <div class="form-row">
+            <div class="form-group {% if errors.user_name %}has-error{% endif %}">
+                <label>用户姓名<span class="required">*</span></label>
+                <input type="text" name="user_name" value="{{ post_data.user_name }}" placeholder="请输入用户姓名">
+                {% if errors.user_name %}<div class="error">{{ errors.user_name }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label>用户电话</label>
+                <input type="tel" name="user_phone" value="{{ post_data.user_phone }}" placeholder="请输入联系电话">
+            </div>
+            <div class="form-group">
+                <label>用户邮箱</label>
+                <input type="email" name="user_email" value="{{ post_data.user_email }}" placeholder="请输入邮箱地址">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>工单来源</label>
+                <select name="source">
+                    {% for value, label in source_choices %}
+                    <option value="{{ value }}" {% if post_data.source == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>工单状态</label>
+                <select name="status">
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if post_data.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>紧急程度</label>
+                <select name="priority">
+                    {% for value, label in priority_choices %}
+                    <option value="{{ value }}" {% if post_data.priority == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>受理人</label>
+                <input type="text" name="receiver" value="{{ post_data.receiver }}" placeholder="请输入受理人">
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" name="handler" value="{{ post_data.handler }}" placeholder="请输入处理人">
+            </div>
+            <div class="form-group">
+                <label>处理部门</label>
+                <select name="handle_department">
+                    <option value="">-- 请选择 --</option>
+                    {% for value, label in department_choices %}
+                    <option value="{{ value }}" {% if post_data.handle_department == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    {% if custom_fields %}
+    <div class="card">
+        <div class="card-title">自定义字段 ({{ ticket_type.name }})</div>
+        <div class="form-row" id="custom_fields_container">
+            {% for field in custom_fields %}
+            <div class="form-group {% if field.error_message %}has-error{% endif %} {% if field.field_type == 'textarea' %}custom-field-textarea{% endif %}"
+                 id="field_group_{{ field.field_code }}"
+                 data-field-code="{{ field.field_code }}"
+                 data-dependent-field="{{ field.dependent_field_code|default:'' }}"
+                 data-dependent-value="{{ field.dependent_value|default:'' }}"
+                 {% if field.dependent_field_code %}style="display: none;"{% endif %}>
+                <label>{{ field.field_name }}{% if field.is_required %}<span class="required">*</span>{% endif %}</label>
+                
+                {% if field.field_type == 'input' %}
+                <input type="text" name="{{ field.field_key }}" 
+                       value="{{ field.post_value }}" 
+                       placeholder="{% if field.placeholder %}{{ field.placeholder }}{% else %}请输入{{ field.field_name }}{% endif %}">
+                
+                {% elif field.field_type == 'select' %}
+                <select name="{{ field.field_key }}">
+                    <option value="">-- 请选择 --</option>
+                    {% if field.options_json %}
+                    {% for option in field.options_json %}
+                    <option value="{{ option }}" {% if field.post_value == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+                
+                {% elif field.field_type == 'textarea' %}
+                <textarea name="{{ field.field_key }}" 
+                          placeholder="{% if field.placeholder %}{{ field.placeholder }}{% else %}请输入{{ field.field_name }}{% endif %}">{{ field.post_value }}</textarea>
+                {% endif %}
+                
+                {% if field.placeholder and field.field_type != 'textarea' %}
+                <div class="help-text">{{ field.placeholder }}</div>
+                {% endif %}
+                
+                {% if field.error_message %}
+                <div class="error">{{ field.error_message }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">创建工单</button>
+            <a href="{% url 'ticket_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </div>
+</form>
+
+<script>
+(function() {
+    var container = document.getElementById('custom_fields_container');
+    if (!container) return;
+    
+    var fieldGroups = container.querySelectorAll('[data-field-code]');
+    var fieldMap = {};
+    
+    fieldGroups.forEach(function(group) {
+        var fieldCode = group.getAttribute('data-field-code');
+        fieldMap[fieldCode] = group;
+    });
+    
+    function getFieldValue(fieldCode) {
+        var group = fieldMap[fieldCode];
+        if (!group) return '';
+        
+        var input = group.querySelector('input[type="text"]');
+        if (input) return input.value;
+        
+        var select = group.querySelector('select');
+        if (select) return select.value;
+        
+        var textarea = group.querySelector('textarea');
+        if (textarea) return textarea.value;
+        
+        return '';
+    }
+    
+    function updateFieldVisibility() {
+        fieldGroups.forEach(function(group) {
+            var dependentField = group.getAttribute('data-dependent-field');
+            var dependentValue = group.getAttribute('data-dependent-value');
+            
+            if (!dependentField) {
+                group.style.display = '';
+                return;
+            }
+            
+            var actualValue = getFieldValue(dependentField);
+            if (actualValue === dependentValue) {
+                group.style.display = '';
+            } else {
+                group.style.display = 'none';
+            }
+        });
+    }
+    
+    fieldGroups.forEach(function(group) {
+        var fieldCode = group.getAttribute('data-field-code');
+        
+        var input = group.querySelector('input[type="text"]');
+        if (input) {
+            input.addEventListener('input', updateFieldVisibility);
+            input.addEventListener('change', updateFieldVisibility);
+        }
+        
+        var select = group.querySelector('select');
+        if (select) {
+            select.addEventListener('change', updateFieldVisibility);
+        }
+        
+        var textarea = group.querySelector('textarea');
+        if (textarea) {
+            textarea.addEventListener('input', updateFieldVisibility);
+            textarea.addEventListener('change', updateFieldVisibility);
+        }
+    });
+    
+    updateFieldVisibility();
+})();
+</script>
+{% endblock %}

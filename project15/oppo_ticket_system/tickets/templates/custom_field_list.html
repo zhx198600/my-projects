@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}自定义字段管理 - OPPO 工单管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    .page-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+        color: white;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    }
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #e0e0e0;
+        color: #666;
+    }
+    .btn-outline:hover {
+        border-color: #1a73e8;
+        color: #1a73e8;
+    }
+    .btn-danger {
+        background: transparent;
+        border: 1px solid #e53935;
+        color: #e53935;
+    }
+    .btn-danger:hover {
+        background: #e53935;
+        color: white;
+    }
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 25px;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+    }
+    .card-header .type-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .type-icon {
+        font-size: 24px;
+    }
+    .type-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+    .type-count {
+        font-size: 13px;
+        color: #999;
+    }
+    .table-container {
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 14px 16px;
+        text-align: left;
+        border-bottom: 1px solid #f5f5f5;
+    }
+    th {
+        font-weight: 600;
+        color: #666;
+        font-size: 13px;
+        background: #fafafa;
+    }
+    td {
+        font-size: 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+    tr:last-child td {
+        border-bottom: none;
+    }
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .badge-input { background: #e3f2fd; color: #1565c0; }
+    .badge-select { background: #fff3e0; color: #ef6c00; }
+    .badge-textarea { background: #e8f5e9; color: #2e7d32; }
+    .badge-required { background: #ffebee; color: #c62828; }
+    .badge-optional { background: #f5f5f5; color: #757575; }
+    .badge-active { background: #e8f5e9; color: #2e7d32; }
+    .badge-inactive { background: #f5f5f5; color: #757575; }
+    .actions {
+        display: flex;
+        gap: 8px;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+        font-size: 14px;
+    }
+    .field-name-col {
+        min-width: 150px;
+    }
+    .field-code-col {
+        min-width: 150px;
+        font-family: monospace;
+        color: #666;
+    }
+    .field-type-col {
+        width: 100px;
+    }
+    .required-col {
+        width: 80px;
+    }
+    .status-col {
+        width: 80px;
+    }
+    .sort-col {
+        width: 60px;
+    }
+    .actions-col {
+        width: 150px;
+    }
+    .alert {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    .alert-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+    }
+</style>
+
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-success">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<div class="page-header">
+    <h2>自定义字段管理</h2>
+</div>
+
+{% for ticket_type in ticket_types %}
+<div class="card">
+    <div class="card-header">
+        <div class="type-info">
+            <span class="type-icon">{{ ticket_type.icon }}</span>
+            <div>
+                <div class="type-name">{{ ticket_type.name }}</div>
+                <div class="type-count">共 {{ ticket_type.field_count }} 个自定义字段</div>
+            </div>
+        </div>
+        <a href="{% url 'custom_field_create' ticket_type.code %}" class="btn btn-primary btn-sm">+ 添加字段</a>
+    </div>
+    
+    {% if ticket_type.custom_fields.all %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th class="field-name-col">字段名称</th>
+                    <th class="field-code-col">字段代码</th>
+                    <th class="field-type-col">控件类型</th>
+                    <th class="required-col">必填</th>
+                    <th class="status-col">状态</th>
+                    <th class="sort-col">排序</th>
+                    <th class="actions-col">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for field in ticket_type.custom_fields.all %}
+                <tr>
+                    <td class="field-name-col">{{ field.field_name }}</td>
+                    <td class="field-code-col">{{ field.field_code }}</td>
+                    <td class="field-type-col">
+                        <span class="badge badge-{{ field.field_type }}">
+                            {% if field.field_type == 'input' %}输入框
+                            {% elif field.field_type == 'select' %}下拉框
+                            {% elif field.field_type == 'textarea' %}文本域
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td class="required-col">
+                        <span class="badge {% if field.is_required %}badge-required{% else %}badge-optional{% endif %}">
+                            {% if field.is_required %}是{% else %}否{% endif %}
+                        </span>
+                    </td>
+                    <td class="status-col">
+                        <span class="badge {% if field.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                            {% if field.is_active %}启用{% else %}禁用{% endif %}
+                        </span>
+                    </td>
+                    <td class="sort-col">{{ field.sort_order }}</td>
+                    <td class="actions-col">
+                        <div class="actions">
+                            <a href="{% url 'custom_field_edit' field.pk %}" class="btn btn-outline btn-sm">编辑</a>
+                            <a href="{% url 'custom_field_delete' field.pk %}" class="btn btn-danger btn-sm">删除</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        暂无自定义字段，点击上方"添加字段"按钮创建
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}
