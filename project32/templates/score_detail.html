@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试成绩详情</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link">开始考试</a>
+                <a href="/scores" class="nav-link active">成绩查询</a>
+            </nav>
+        </header>
+
+        <div id="scoreContent">
+            <div class="empty-state">正在加载成绩详情...</div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const scoreId = {{ score_id }};
+        const API_BASE = `/api/scores/${scoreId}`;
+
+        const scoreContent = document.getElementById('scoreContent');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function getScoreColor(score) {
+            if (score >= 90) return 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            if (score >= 80) return 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+            if (score >= 70) return 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)';
+            if (score >= 60) return 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)';
+            return 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)';
+        }
+
+        function renderScore(data) {
+            const accuracy = Math.round((data.correct_count / data.total_count) * 100);
+            const answerDetails = data.answer_details || [];
+
+            scoreContent.innerHTML = `
+                <div class="card">
+                    <div class="result-summary" style="background: ${getScoreColor(data.score)}">
+                        <div class="result-score">${data.score}</div>
+                        <div class="result-label">总分</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>考试信息</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${data.exam_name}</div>
+                                <div class="stat-label">考试名称</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.student_name}</div>
+                                <div class="stat-label">考生姓名</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.submit_time}</div>
+                                <div class="stat-label">提交时间</div>
+                            </div>
+                        </div>
+                        <div class="result-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${data.correct_count}/${data.total_count}</div>
+                                <div class="stat-label">正确率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${accuracy}%</div>
+                                <div class="stat-label">准确率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.score}/${data.total_score}</div>
+                                <div class="stat-label">得分</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>答题详情</h2>
+                        <div>
+                            <span class="badge badge-correct">正确 ${data.correct_count} 题</span>
+                            <span class="badge" style="background: #fee2e2; color: #dc2626; margin-left: 8px;">错误 ${data.total_count - data.correct_count} 题</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        ${answerDetails.map((r, i) => `
+                            <div class="result-item ${r.is_correct ? 'correct' : 'wrong'}">
+                                <div class="result-question">
+                                    <span class="badge ${r.is_correct ? 'badge-correct' : ''}" style="background: ${r.is_correct ? '#dcfce7' : '#fee2e2'}; color: ${r.is_correct ? '#166534' : '#dc2626'}; margin-right: 12px;">
+                                        ${r.is_correct ? '✓ 正确' : '✗ 错误'}
+                                    </span>
+                                    <span style="font-weight: 600;">第 ${i + 1} 题：</span> ${r.question_text}
+                                    <span style="float: right; font-weight: 600; color: ${r.is_correct ? '#16a34a' : '#dc2626'};">+${r.score} 分</span>
+                                </div>
+                                <div style="margin-top: 12px; padding-left: 12px;">
+                                    ${Object.entries(r.options).map(([key, value]) => `
+                                        <div style="padding: 8px 12px; margin: 4px 0; border-radius: 6px; ${
+                                            key === r.correct_answer ? 'background: #dcfce7; border: 2px solid #22c55e;' :
+                                            key === r.user_answer && key !== r.correct_answer ? 'background: #fee2e2; border: 2px solid #ef4444;' :
+                                            'background: #f8fafc;'
+                                        }">
+                                            <span style="font-weight: 600;">${key}.</span> ${value}
+                                            ${key === r.correct_answer ? ' <span style="color: #16a34a; font-weight: 600;">(正确答案)</span>' : ''}
+                                            ${key === r.user_answer && key !== r.correct_answer ? ' <span style="color: #dc2626; font-weight: 600;">(你的选择)</span>' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadScore() {
+            showPageLoading();
+            try {
+                const response = await fetch(API_BASE);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderScore(result.data);
+                } else {
+                    scoreContent.innerHTML = '<div class="empty-state">加载失败：' + result.message + '</div>';
+                    showToast('加载失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                scoreContent.innerHTML = '<div class="empty-state">网络错误，请刷新重试</div>';
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        loadScore();
+    </script>
+</body>
+</html>

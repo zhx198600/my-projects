@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线考试系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link active">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link">开始考试</a>
+                <a href="/scores" class="nav-link">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="welcome-section">
+            <div class="welcome-content">
+                <h2>欢迎使用在线考试系统</h2>
+                <p>高效、便捷的一体化考试管理平台，支持题库管理、随机组卷、在线答题、成绩分析等完整功能</p>
+            </div>
+        </div>
+
+        <div class="module-grid">
+            <a href="/questions" class="module-card">
+                <div class="module-icon module-icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <h3>题库管理</h3>
+                <p>管理所有考试题目，支持按科目、难度分类，可添加、编辑、删除题目</p>
+                <span class="module-link">进入管理 →</span>
+            </a>
+
+            <a href="/exams" class="module-card">
+                <div class="module-icon module-icon-purple">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <h3>试卷生成</h3>
+                <p>根据科目、难度、题量智能生成随机试卷，避免题目重复，保证公平性</p>
+                <span class="module-link">开始生成 →</span>
+            </a>
+
+            <a href="/exam-list" class="module-card">
+                <div class="module-icon module-icon-green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <h3>开始考试</h3>
+                <p>在线答题，实时计时，答题进度可视化，自动保存答题记录</p>
+                <span class="module-link">进入考场 →</span>
+            </a>
+
+            <a href="/scores" class="module-card">
+                <div class="module-icon module-icon-orange">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+                <h3>成绩查询</h3>
+                <p>查看所有考试成绩，详细的答题分析，每题对错标注和正确答案解析</p>
+                <span class="module-link">查看成绩 →</span>
+            </a>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number" id="questionCount">0</div>
+                <div class="stat-label">题库题目总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="examCount">0</div>
+                <div class="stat-label">已生成试卷数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="scoreCount">0</div>
+                <div class="stat-label">完成考试次数</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        async function loadStats() {
+            try {
+                const [questionsRes, examsRes, scoresRes] = await Promise.all([
+                    fetch('/api/questions'),
+                    fetch('/api/exams'),
+                    fetch('/api/scores')
+                ]);
+
+                const questions = await questionsRes.json();
+                const exams = await examsRes.json();
+                const scores = await scoresRes.json();
+
+                document.getElementById('questionCount').textContent = questions.data?.length || 0;
+                document.getElementById('examCount').textContent = exams.data?.length || 0;
+                document.getElementById('scoreCount').textContent = scores.data?.length || 0;
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>

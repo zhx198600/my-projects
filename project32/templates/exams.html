@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机试卷生成系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link active">试卷生成</a>
+                <a href="/exam-list" class="nav-link">开始考试</a>
+                <a href="/scores" class="nav-link">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>生成参数设置</h2>
+            </div>
+            <div class="card-body">
+                <form id="generateForm" class="form-inline">
+                    <div class="form-group">
+                        <label for="subject">科目：</label>
+                        <select id="subject" required>
+                            <option value="">请选择科目</option>
+                            <option value="数学">数学</option>
+                            <option value="语文">语文</option>
+                            <option value="英语">英语</option>
+                            <option value="物理">物理</option>
+                            <option value="化学">化学</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="difficulty">难度：</label>
+                        <select id="difficulty">
+                            <option value="">全部难度</option>
+                            <option value="简单">简单</option>
+                            <option value="中等">中等</option>
+                            <option value="困难">困难</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionCount">题量：</label>
+                        <input type="number" id="questionCount" min="1" max="100" value="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="examName">试卷名称：</label>
+                        <input type="text" id="examName" placeholder="自动生成">
+                    </div>
+
+                    <button type="submit" id="generateBtn" class="btn btn-primary">
+                        <span id="btnText">生成试卷</span>
+                        <span id="btnLoading" style="display:none;">生成中...</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="previewSection" class="card" style="display:none;">
+            <div class="card-header">
+                <h2>生成的试卷预览</h2>
+                <span id="examInfo" class="badge badge-success"></span>
+            </div>
+            <div class="card-body" id="examPreview">
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>已生成试卷列表</h2>
+                <button id="refreshList" class="btn btn-sm btn-secondary">刷新</button>
+            </div>
+            <div class="card-body">
+                <div id="examList" class="exam-list">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_BASE = '/api/exams';
+        const generateForm = document.getElementById('generateForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const previewSection = document.getElementById('previewSection');
+        const examPreview = document.getElementById('examPreview');
+        const examInfo = document.getElementById('examInfo');
+        const examList = document.getElementById('examList');
+        const refreshList = document.getElementById('refreshList');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function setLoading(loading) {
+            generateBtn.disabled = loading;
+            btnText.style.display = loading ? 'none' : 'inline';
+            btnLoading.style.display = loading ? 'inline' : 'none';
+        }
+
+        async function generateExam(e) {
+            e.preventDefault();
+
+            const subject = document.getElementById('subject').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const question_count = parseInt(document.getElementById('questionCount').value);
+            let exam_name = document.getElementById('examName').value;
+
+            if (!exam_name) {
+                exam_name = `${subject}随机试卷-${new Date().toLocaleDateString()}`;
+            }
+            
+            if (!subject) {
+                showToast('请选择科目', 'warning');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, difficulty, question_count, exam_name })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('试卷生成成功！');
+                    renderExamPreview(result.data);
+                    loadExamList();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function renderExamPreview(exam) {
+            previewSection.style.display = 'block';
+            examInfo.textContent = `${exam.subject} | ${exam.question_count}道题 | 总分${exam.total_score}分`;
+
+            examPreview.innerHTML = `
+                <h3 style="text-align:center; margin-bottom:20px;">${exam.exam_name}</h3>
+                <div class="exam-meta" style="text-align:center; color:#666; margin-bottom:30px;">
+                    科目：${exam.subject} | ${exam.difficulty || '混合难度'} | 共${exam.question_count}题 | 总分${exam.total_score}分
+                </div>
+                ${exam.questions.map((q, index) => `
+                    <div class="question-item" style="margin-bottom:25px; padding:15px; background:#f8f9fa; border-radius:8px;">
+                        <div style="font-weight:bold; margin-bottom:10px;">
+                            <span class="badge badge-subject">${q.subject}</span>
+                            <span class="badge badge-difficulty">${q.difficulty}</span>
+                            ${index + 1}. ${q.question_text}
+                        </div>
+                        <div class="options" style="padding-left:20px;">
+                            ${Object.entries(q.options).map(([key, value]) => `
+                                <div style="margin:5px 0;">${key}. ${value}</div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top:10px; color:#28a745; font-size:14px;">
+                            正确答案：${q.correct_answer} (题目ID: ${q.id})
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            const ids = exam.questions.map(q => q.id);
+            const uniqueIds = [...new Set(ids)];
+            if (ids.length === uniqueIds.length) {
+                console.log('✓ 验证通过：所有题目ID不重复');
+            } else {
+                console.log('✗ 验证失败：存在重复题目ID');
+            }
+            console.log('题目ID列表：', ids);
+        }
+
+        async function loadExamList() {
+            showPageLoading();
+            try {
+                const response = await fetch(API_BASE);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderExamList(result.data);
+                } else {
+                    examList.innerHTML = '<div class="empty-state">加载失败</div>';
+                    showToast('加载失败', 'error');
+                }
+            } catch (error) {
+                examList.innerHTML = '<div class="empty-state">网络错误</div>';
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        function renderExamList(exams) {
+            if (exams.length === 0) {
+                examList.innerHTML = '<div class="empty-state">暂无生成的试卷</div>';
+                return;
+            }
+
+            examList.innerHTML = exams.map(exam => `
+                <div class="exam-item">
+                    <div class="exam-item-header">
+                        <strong>${exam.exam_name}</strong>
+                        <span class="badge badge-primary">${exam.created_at}</span>
+                    </div>
+                    <div class="exam-item-body">
+                        <span>科目：${exam.subject}</span>
+                        <span>题量：${exam.question_count}道</span>
+                        <span>总分：${exam.total_score}分</span>
+                        <span>难度：${exam.difficulty || '混合'}</span>
+                    </div>
+                    <div class="exam-item-footer">
+                        <button class="btn btn-sm btn-secondary" onclick='viewExam(${JSON.stringify(exam).replace(/'/g, "\\'")})'>查看详情</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewExam(exam) {
+            renderExamPreview(exam);
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        generateForm.addEventListener('submit', generateExam);
+        refreshList.addEventListener('click', loadExamList);
+
+        loadExamList();
+    </script>
+</body>
+</html>

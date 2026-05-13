@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>故宫3D虚拟漫游</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-text">🏯 加载故宫场景中...</div>
+    <div class="loading-bar">
+      <div class="loading-progress" id="loading-progress"></div>
+    </div>
+  </div>
+
+  <div id="start-screen">
+    <div class="start-title">故宫博物院</div>
+    <div class="start-subtitle">3D虚拟沉浸式漫游</div>
+    <button class="start-btn" id="start-btn">开始漫游</button>
+    <div class="controls-info">
+      <div class="controls-title">操作说明</div>
+      <div class="controls-grid">
+        <div class="control-item">
+          <span class="key">W</span>
+          <span>向前移动</span>
+        </div>
+        <div class="control-item">
+          <span class="key">S</span>
+          <span>向后移动</span>
+        </div>
+        <div class="control-item">
+          <span class="key">A</span>
+          <span>向左移动</span>
+        </div>
+        <div class="control-item">
+          <span class="key">D</span>
+          <span>向右移动</span>
+        </div>
+        <div class="control-item">
+          <span class="key">鼠标</span>
+          <span>控制视角</span>
+        </div>
+        <div class="control-item">
+          <span class="key">P</span>
+          <span>一键截图</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fps-counter">FPS: 60</div>
+
+  <div class="controls-hud" id="controls-hud">
+    <div class="hud-title">操作提示</div>
+    <div class="hud-keys">
+      <div class="hud-key"><span>W</span>前进</div>
+      <div class="hud-key"><span>A</span>左</div>
+      <div class="hud-key"><span>S</span>后退</div>
+      <div class="hud-key"><span>D</span>右</div>
+      <div class="hud-key"><span>鼠标</span>视角</div>
+      <div class="hud-key"><span>P</span>截图</div>
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

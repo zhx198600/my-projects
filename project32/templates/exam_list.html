@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线答题 - 试卷选择</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link active">开始考试</a>
+                <a href="/scores" class="nav-link">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>可用试卷列表</h2>
+                <button id="refreshList" class="btn btn-sm btn-secondary">刷新列表</button>
+            </div>
+            <div class="card-body">
+                <div id="examList" class="exam-list">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_BASE = '/api/exams';
+        const examList = document.getElementById('examList');
+        const refreshList = document.getElementById('refreshList');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        async function loadExamList() {
+            showPageLoading();
+            try {
+                const response = await fetch(API_BASE);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderExamList(result.data);
+                } else {
+                    examList.innerHTML = '<div class="empty-state">加载失败</div>';
+                    showToast('加载失败', 'error');
+                }
+            } catch (error) {
+                examList.innerHTML = '<div class="empty-state">网络错误</div>';
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        function renderExamList(exams) {
+            if (exams.length === 0) {
+                examList.innerHTML = '<div class="empty-state">暂无可用试卷，请先到「试卷生成」页面生成试卷</div>';
+                return;
+            }
+
+            examList.innerHTML = exams.map(exam => `
+                <div class="exam-item">
+                    <div class="exam-item-header">
+                        <strong>${exam.exam_name}</strong>
+                        <span class="badge badge-primary">${exam.created_at}</span>
+                    </div>
+                    <div class="exam-item-body">
+                        <span>科目：${exam.subject}</span>
+                        <span>题量：${exam.question_count}道</span>
+                        <span>总分：${exam.total_score}分</span>
+                        <span>难度：${exam.difficulty || '混合'}</span>
+                    </div>
+                    <div class="exam-item-footer">
+                        <button class="btn btn-sm btn-primary" onclick="startExam(${exam.id})">开始答题</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startExam(examId) {
+            if (confirm('确定要开始这份试卷吗？进入后将开始计时（60分钟）！')) {
+                window.location.href = `/exam/${examId}`;
+            }
+        }
+
+        refreshList.addEventListener('click', loadExamList);
+        loadExamList();
+    </script>
+</body>
+</html>

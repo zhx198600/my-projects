@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成绩列表</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link">开始考试</a>
+                <a href="/scores" class="nav-link active">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="table-section">
+            <div style="padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #1e293b;">所有考试成绩</h2>
+                <span id="scoreCount" style="font-size: 14px; color: #64748b;">共 0 条记录</span>
+            </div>
+            <div id="scoresTableContainer">
+                <div class="empty-state">正在加载成绩数据...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const scoresTableContainer = document.getElementById('scoresTableContainer');
+        const scoreCount = document.getElementById('scoreCount');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function getScoreBadge(score) {
+            if (score >= 90) return '<span class="badge" style="background: #dcfce7; color: #166534;">优秀</span>';
+            if (score >= 80) return '<span class="badge" style="background: #dcfce7; color: #166534;">良好</span>';
+            if (score >= 70) return '<span class="badge" style="background: #ffedd5; color: #c2410c;">中等</span>';
+            if (score >= 60) return '<span class="badge" style="background: #ffedd5; color: #c2410c;">及格</span>';
+            return '<span class="badge" style="background: #fee2e2; color: #dc2626;">不及格</span>';
+        }
+
+        function renderScores(scores) {
+            if (scores.length === 0) {
+                scoresTableContainer.innerHTML = '<div class="empty-state">暂无考试成绩记录</div>';
+                return;
+            }
+
+            scoreCount.textContent = `共 ${scores.length} 条记录`;
+
+            scoresTableContainer.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>考试名称</th>
+                            <th>考生姓名</th>
+                            <th>得分</th>
+                            <th>正确率</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${scores.map(s => `
+                            <tr>
+                                <td>${s.id}</td>
+                                <td><strong>${s.exam_name}</strong></td>
+                                <td>${s.student_name}</td>
+                                <td>
+                                    <strong style="font-size: 18px; ${s.score >= 60 ? 'color: #16a34a;' : 'color: #dc2626;'}">${s.score}</strong>
+                                    / ${s.total_score}
+                                    ${getScoreBadge(s.score)}
+                                </td>
+                                <td>${s.correct_count}/${s.total_count} 题</td>
+                                <td>${s.submit_time}</td>
+                                <td>
+                                    <a href="/score/${s.id}" class="btn btn-primary btn-sm">查看详情</a>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function loadScores() {
+            showPageLoading();
+            try {
+                const response = await fetch('/api/scores');
+                const result = await response.json();
+
+                if (result.success) {
+                    renderScores(result.data);
+                } else {
+                    scoresTableContainer.innerHTML = '<div class="empty-state">加载失败：' + result.message + '</div>';
+                    showToast('加载失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                scoresTableContainer.innerHTML = '<div class="empty-state">网络错误，请刷新重试</div>';
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        loadScores();
+    </script>
+</body>
+</html>

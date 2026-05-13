@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线答题</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-user-drag: none !important;
+        }
+        
+        body {
+            position: relative;
+            transition: filter 0.1s ease;
+        }
+        
+        body.screenshot-detected {
+            filter: blur(20px) brightness(0);
+        }
+        
+        body::before {
+            content: "考试系统 禁止截图复制";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 24px;
+            color: rgba(255, 100, 100, 0.15);
+            z-index: 9999;
+            pointer-events: none;
+            white-space: pre;
+            line-height: 3;
+            letter-spacing: 5px;
+            transform: rotate(-30deg);
+            overflow: hidden;
+        }
+        
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 100px,
+                rgba(255, 0, 0, 0.02) 100px,
+                rgba(255, 0, 0, 0.02) 200px
+            );
+            z-index: 9998;
+            pointer-events: none;
+        }
+        
+        .screenshot-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 16px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 99999;
+            display: none;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .screenshot-warning.active {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-48%, -52%); }
+            75% { transform: translate(-52%, -48%); }
+        }
+        
+        img, div, p, span {
+            -webkit-user-drag: none !important;
+        }
+        
+        @media print {
+            * {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1 id="examTitle">在线考试</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link active">开始考试</a>
+                <a href="/scores" class="nav-link">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="exam-timer-card">
+            <div class="timer-container">
+                <div class="timer-label">考试剩余时间</div>
+                <div id="timer" class="timer-display">60:00</div>
+                <div class="timer-warning" id="timerWarning" style="display:none;">⚠️ 时间即将耗尽！</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-label">答题进度</div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div id="progressText" class="progress-text">0 / 0 题已完成</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>答题区域</h2>
+                <button id="submitBtn" class="btn btn-primary">提交试卷</button>
+            </div>
+            <div class="card-body" id="questionsContainer">
+                <div class="empty-state">正在加载题目...</div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="screenshotWarning" class="screenshot-warning">
+        <div style="font-size:50px; margin-bottom:20px;">⚠️</div>
+        <div>检测到截图操作！</div>
+        <div style="font-size:14px; margin-top:10px; opacity:0.8;">考试期间禁止截图</div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const examId = {{ exam_id }};
+        const API_BASE = `/api/exams/${examId}`;
+        const STORAGE_KEY = `exam_${examId}_answers`;
+        const TIME_KEY = `exam_${examId}_time`;
+        
+        const DEFAULT_TIME = 60 * 60;
+        let remainingTime = DEFAULT_TIME;
+        let timerInterval = null;
+        let examData = null;
+        let isSubmitted = false;
+
+        const timer = document.getElementById('timer');
+        const timerWarning = document.getElementById('timerWarning');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const examTitle = document.getElementById('examTitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            timer.textContent = formatTime(remainingTime);
+            
+            if (remainingTime <= 300) {
+                timer.classList.add('timer-urgent');
+                timerWarning.style.display = 'block';
+            } else {
+                timer.classList.remove('timer-urgent');
+                timerWarning.style.display = 'none';
+            }
+            
+            if (remainingTime <= 0) {
+                clearInterval(timerInterval);
+                autoSubmit();
+            }
+        }
+
+        function startTimer() {
+            const savedTime = localStorage.getItem(TIME_KEY);
+            if (savedTime !== null) {
+                const parsedTime = parseInt(savedTime);
+                if (parsedTime > 0 && parsedTime <= DEFAULT_TIME) {
+                    remainingTime = parsedTime;
+                }
+            }
+            
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                remainingTime--;
+                updateTimerDisplay();
+                localStorage.setItem(TIME_KEY, remainingTime.toString());
+            }, 1000);
+        }
+
+        function saveAnswer(questionId, answer) {
+            const answers = getSavedAnswers();
+            answers[questionId] = answer;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
+            updateProgress();
+        }
+
+        function getSavedAnswers() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        function clearLocalStorage() {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(TIME_KEY);
+        }
+
+        function updateProgress() {
+            if (!examData) return;
+            
+            const answers = getSavedAnswers();
+            const answered = Object.keys(answers).length;
+            const total = examData.questions.length;
+            const percent = Math.round((answered / total) * 100);
+            
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `${answered} / ${total} 题已完成`;
+        }
+
+        async function autoSubmit() {
+            if (isSubmitted) return;
+            showToast('考试时间到，自动提交试卷！', 'error');
+            await submitExam();
+        }
+
+        async function submitExam() {
+            if (isSubmitted) return;
+            isSubmitted = true;
+            
+            clearInterval(timerInterval);
+            
+            const answers = getSavedAnswers();
+            const studentName = prompt('请输入考生姓名：', '匿名考生') || '匿名考生';
+            
+            try {
+                const response = await fetch(`${API_BASE}/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answers, student_name: studentName })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    clearLocalStorage();
+                    showToast('试卷提交成功！正在跳转到成绩页面...');
+                    setTimeout(() => {
+                        window.location.href = `/score/${result.data.score_id}`;
+                    }, 1500);
+                } else {
+                    showToast('提交失败：' + result.message, 'error');
+                    isSubmitted = false;
+                }
+            } catch (error) {
+                showToast('网络错误：' + error.message, 'error');
+                isSubmitted = false;
+            }
+        }
+
+        function renderQuestions() {
+            const answers = getSavedAnswers();
+            
+            questionsContainer.innerHTML = examData.questions.map((q, index) => `
+                <div class="question-card" id="question-${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">${index + 1}</span>
+                        <span class="badge badge-subject">${q.subject}</span>
+                        <span class="badge badge-difficulty">${q.difficulty}</span>
+                    </div>
+                    <div class="question-text">${q.question_text}</div>
+                    <div class="options">
+                        ${Object.entries(q.options).map(([key, value]) => `
+                            <label class="option-label ${answers[q.id] === key ? 'selected' : ''}">
+                                <input type="radio" name="q${q.id}" value="${key}" 
+                                    ${answers[q.id] === key ? 'checked' : ''} 
+                                    onchange="selectOption(${q.id}, '${key}')">
+                                <span class="option-text">
+                                    <span class="option-key">${key}</span>
+                                    <span class="option-value">${value}</span>
+                                </span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            updateProgress();
+        }
+
+        function selectOption(questionId, answer) {
+            saveAnswer(questionId, answer);
+            
+            document.querySelectorAll(`input[name="q${questionId}"]`).forEach(input => {
+                const label = input.closest('.option-label');
+                if (input.checked) {
+                    label.classList.add('selected');
+                } else {
+                    label.classList.remove('selected');
+                }
+            });
+        }
+
+        async function loadExam() {
+            showPageLoading();
+            try {
+                const response = await fetch(API_BASE);
+                const result = await response.json();
+
+                if (result.success) {
+                    examData = result.data;
+                    examTitle.textContent = examData.exam_name;
+                    renderQuestions();
+                    startTimer();
+                } else {
+                    questionsContainer.innerHTML = '<div class="empty-state">试卷加载失败：' + result.message + '</div>';
+                    showToast('加载失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                questionsContainer.innerHTML = '<div class="empty-state">网络错误，请刷新重试</div>';
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const answers = getSavedAnswers();
+            const answered = Object.keys(answers).length;
+            const total = examData.questions.length;
+            
+            if (answered < total) {
+                if (!confirm(`还有 ${total - answered} 题未作答，确定要提交吗？`)) {
+                    return;
+                }
+            } else {
+                if (!confirm('确定要提交试卷吗？')) {
+                    return;
+                }
+            }
+            
+            submitExam();
+        });
+
+        window.addEventListener('beforeunload', (e) => {
+            if (!isSubmitted && remainingTime > 0 && remainingTime < DEFAULT_TIME) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        const screenshotWarning = document.getElementById('screenshotWarning');
+        
+        function triggerScreenshotProtection() {
+            document.body.classList.add('screenshot-detected');
+            screenshotWarning.classList.add('active');
+            
+            setTimeout(() => {
+                document.body.classList.remove('screenshot-detected');
+                screenshotWarning.classList.remove('active');
+            }, 3000);
+        }
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            showToast('考试期间禁止右键操作', 'warning');
+            return false;
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                e.preventDefault();
+                triggerScreenshotProtection();
+                showToast('⚠️ 考试期间禁止截图操作，页面已临时屏蔽', 'error');
+                return false;
+            }
+            
+            if ((e.metaKey && e.shiftKey && (e.key === '5' || e.keyCode === 53)) ||
+                (e.metaKey && e.shiftKey && (e.key === '4' || e.keyCode === 52)) ||
+                (e.metaKey && e.shiftKey && (e.key === '3' || e.keyCode === 51))) {
+                e.preventDefault();
+                triggerScreenshotProtection();
+                showToast('⚠️ 检测到 Mac 截图快捷键，页面已临时屏蔽', 'error');
+                return false;
+            }
+            
+            if ((e.winKey && e.key === 'PrintScreen') || (e.winKey && e.keyCode === 44)) {
+                e.preventDefault();
+                triggerScreenshotProtection();
+                showToast('⚠️ 考试期间禁止截图操作', 'error');
+                return false;
+            }
+            
+            if ((e.ctrlKey && e.key === 'p') || (e.ctrlKey && e.keyCode === 80)) {
+                e.preventDefault();
+                showToast('考试期间禁止打印页面', 'warning');
+                return false;
+            }
+            
+            if ((e.ctrlKey && e.key === 'c') || (e.ctrlKey && e.keyCode === 67)) {
+                e.preventDefault();
+                showToast('考试期间禁止复制内容', 'warning');
+                return false;
+            }
+            
+            if ((e.ctrlKey && e.key === 's') || (e.ctrlKey && e.keyCode === 83)) {
+                e.preventDefault();
+                showToast('考试期间禁止保存页面', 'warning');
+                return false;
+            }
+            
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                showToast('考试期间禁止打开开发者工具', 'warning');
+                return false;
+            }
+            
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
+                e.preventDefault();
+                showToast('考试期间禁止打开开发者工具', 'warning');
+                return false;
+            }
+        });
+        
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            showToast('考试期间禁止复制内容', 'warning');
+            return false;
+        });
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                showToast('⚠️ 请勿切换窗口离开考试页面', 'warning');
+            }
+        });
+        
+        loadExam();
+    </script>
+</body>
+</html>

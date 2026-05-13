@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026天猫双11全球狂欢节实时数据大屏</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <canvas class="particles-bg" id="particlesBg"></canvas>
+    <div class="grid-bg"></div>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="corner-decoration corner-tl"></div>
+            <div class="corner-decoration corner-tr"></div>
+            <div class="corner-decoration corner-bl"></div>
+            <div class="corner-decoration corner-br"></div>
+            <h1 class="dashboard-title">2026天猫双11全球狂欢节</h1>
+            <div class="header-metrics">
+                <div class="metric-card">
+                    <div class="metric-value" id="metric1">0</div>
+                    <div class="metric-label">总交易额</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric2">0</div>
+                    <div class="metric-label">订单总量</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric3">0</div>
+                    <div class="metric-label">平均客单价</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="metric4">0</div>
+                    <div class="metric-label">在线用户数</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="map-section">
+                <div class="section-header">
+                    <div class="section-title" id="mapTitle">全国分布地图</div>
+                    <div class="refresh-info">
+                        <span class="refresh-hint">💡 点击省份可下钻查看市级数据</span>
+                        <span class="refresh-countdown" id="refreshCountdown">下次刷新: 60秒</span>
+                    </div>
+                    <button id="backToNationalBtn" class="back-btn" style="display: none;">
+                        ← 返回全国地图
+                    </button>
+                </div>
+                <div id="china-map" class="map-container"></div>
+            </section>
+
+            <aside class="rank-section">
+                <div class="section-title" id="rankTitle">省份排行榜</div>
+                <div class="rank-list" id="rankList"></div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="js/map.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题库管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1>在线考试系统</h1>
+            <nav class="nav">
+                <a href="/" class="nav-link">首页</a>
+                <a href="/questions" class="nav-link active">题库管理</a>
+                <a href="/exams" class="nav-link">试卷生成</a>
+                <a href="/exam-list" class="nav-link">开始考试</a>
+                <a href="/scores" class="nav-link">成绩查询</a>
+            </nav>
+        </header>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="filterSubject">按科目筛选：</label>
+                <select id="filterSubject">
+                    <option value="">全部科目</option>
+                    <option value="数学">数学</option>
+                    <option value="语文">语文</option>
+                    <option value="英语">英语</option>
+                    <option value="物理">物理</option>
+                    <option value="化学">化学</option>
+                </select>
+            </div>
+            <button id="addBtn" class="btn btn-primary">添加题目</button>
+        </div>
+
+        <div class="table-section">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>科目</th>
+                        <th>题干</th>
+                        <th>正确答案</th>
+                        <th>难度</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="questionList">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加题目</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="questionForm">
+                    <input type="hidden" id="questionId">
+                    
+                    <div class="form-group">
+                        <label for="subject">科目：</label>
+                        <select id="subject" required>
+                            <option value="">请选择科目</option>
+                            <option value="数学">数学</option>
+                            <option value="语文">语文</option>
+                            <option value="英语">英语</option>
+                            <option value="物理">物理</option>
+                            <option value="化学">化学</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="questionText">题干：</label>
+                        <textarea id="questionText" rows="3" required placeholder="请输入题目内容"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>选项：</label>
+                        <div class="options-group">
+                            <div class="option-item">
+                                <span class="option-label">A.</span>
+                                <input type="text" id="optionA" placeholder="选项A内容" required>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label">B.</span>
+                                <input type="text" id="optionB" placeholder="选项B内容" required>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label">C.</span>
+                                <input type="text" id="optionC" placeholder="选项C内容" required>
+                            </div>
+                            <div class="option-item">
+                                <span class="option-label">D.</span>
+                                <input type="text" id="optionD" placeholder="选项D内容" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="correctAnswer">正确答案：</label>
+                        <select id="correctAnswer" required>
+                            <option value="">请选择正确答案</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="difficulty">难度：</label>
+                        <select id="difficulty" required>
+                            <option value="">请选择难度</option>
+                            <option value="简单">简单</option>
+                            <option value="中等">中等</option>
+                            <option value="困难">困难</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-body">
+                <p class="confirm-message">确定要删除这道题目吗？此操作不可撤销。</p>
+                <div class="confirm-actions">
+                    <button id="cancelDelete" class="btn btn-secondary">取消</button>
+                    <button id="confirmDelete" class="btn btn-danger">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_BASE = '/api/questions';
+        let currentEditId = null;
+        let deleteTargetId = null;
+
+        const modal = document.getElementById('modal');
+        const confirmModal = document.getElementById('confirmModal');
+        const questionForm = document.getElementById('questionForm');
+        const questionList = document.getElementById('questionList');
+        const filterSubject = document.getElementById('filterSubject');
+        const addBtn = document.getElementById('addBtn');
+        const closeBtn = document.querySelector('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const modalTitle = document.getElementById('modalTitle');
+        const toast = document.getElementById('toast');
+
+        function showToast(message, type = 'success') {
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || '✓'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            toast.className = `toast toast-${type}`;
+            toast.style.display = 'flex';
+            toast.style.animation = 'toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3500);
+        }
+
+        function showPageLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hidePageLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        async function loadQuestions() {
+            showPageLoading();
+            const subject = filterSubject.value;
+            const url = subject ? `${API_BASE}?subject=${encodeURIComponent(subject)}` : API_BASE;
+            
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderQuestions(result.data);
+                } else {
+                    showToast('加载失败：' + result.message, 'error');
+                }
+            } catch (error) {
+                showToast('网络错误：' + error.message, 'error');
+            } finally {
+                hidePageLoading();
+            }
+        }
+
+        function renderQuestions(questions) {
+            if (questions.length === 0) {
+                questionList.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">暂无题目数据</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            questionList.innerHTML = questions.map(q => `
+                <tr>
+                    <td>${q.id}</td>
+                    <td><span class="badge badge-subject">${q.subject}</span></td>
+                    <td class="question-text">${q.question_text}</td>
+                    <td><span class="badge badge-correct">${q.correct_answer}</span></td>
+                    <td><span class="badge badge-difficulty">${q.difficulty}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-edit" onclick="editQuestion(${q.id})">编辑</button>
+                        <button class="btn btn-sm btn-delete" onclick="showDeleteConfirm(${q.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddModal() {
+            currentEditId = null;
+            modalTitle.textContent = '添加题目';
+            questionForm.reset();
+            document.getElementById('questionId').value = '';
+            
+            const selectedFilterSubject = filterSubject.value;
+            if (selectedFilterSubject) {
+                document.getElementById('subject').value = selectedFilterSubject;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        async function editQuestion(id) {
+            currentEditId = id;
+            modalTitle.textContent = '编辑题目';
+            
+            try {
+                const response = await fetch(`${API_BASE}?id=${id}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const question = result.data.find(q => q.id === id);
+                    if (question) {
+                        document.getElementById('questionId').value = question.id;
+                        document.getElementById('subject').value = question.subject;
+                        document.getElementById('questionText').value = question.question_text;
+                        document.getElementById('optionA').value = question.options.A || '';
+                        document.getElementById('optionB').value = question.options.B || '';
+                        document.getElementById('optionC').value = question.options.C || '';
+                        document.getElementById('optionD').value = question.options.D || '';
+                        document.getElementById('correctAnswer').value = question.correct_answer;
+                        document.getElementById('difficulty').value = question.difficulty;
+                        modal.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                showToast('加载题目失败：' + error.message, 'error');
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            currentEditId = null;
+        }
+
+        function showDeleteConfirm(id) {
+            deleteTargetId = id;
+            confirmModal.style.display = 'block';
+        }
+
+        function closeDeleteConfirm() {
+            confirmModal.style.display = 'none';
+            deleteTargetId = null;
+        }
+
+        async function submitForm(e) {
+            e.preventDefault();
+            
+            const questionData = {
+                subject: document.getElementById('subject').value,
+                question_text: document.getElementById('questionText').value,
+                options: {
+                    A: document.getElementById('optionA').value,
+                    B: document.getElementById('optionB').value,
+                    C: document.getElementById('optionC').value,
+                    D: document.getElementById('optionD').value
+                },
+                correct_answer: document.getElementById('correctAnswer').value,
+                difficulty: document.getElementById('difficulty').value
+            };
+
+            try {
+                let response, result;
+                
+                if (currentEditId) {
+                    response = await fetch(`${API_BASE}/${currentEditId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(questionData)
+                    });
+                    result = await response.json();
+                    if (result.success) showToast('更新成功！');
+                } else {
+                    response = await fetch(API_BASE, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(questionData)
+                    });
+                    result = await response.json();
+                    if (result.success) showToast('添加成功！');
+                }
+
+                if (result.success) {
+                    closeModal();
+                    loadQuestions();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('操作失败：' + error.message, 'error');
+            }
+        }
+
+        async function deleteQuestion() {
+            try {
+                const response = await fetch(`${API_BASE}/${deleteTargetId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('删除成功！');
+                    closeDeleteConfirm();
+                    loadQuestions();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('删除失败：' + error.message, 'error');
+            }
+        }
+
+        addBtn.addEventListener('click', openAddModal);
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        questionForm.addEventListener('submit', submitForm);
+        filterSubject.addEventListener('change', loadQuestions);
+        cancelDelete.addEventListener('click', closeDeleteConfirm);
+        confirmDelete.addEventListener('click', deleteQuestion);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+            if (e.target === confirmModal) closeDeleteConfirm();
+        });
+
+        loadQuestions();
+    </script>
+</body>
+</html>

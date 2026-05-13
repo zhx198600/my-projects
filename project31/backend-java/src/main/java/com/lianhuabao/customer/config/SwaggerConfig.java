@@ -1,0 +1,21 @@
+package com.lianhuabao.customer.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("联华保险客户档案管理系统API")
+                        .version("1.0.0")
+                        .description("联华保险客户档案管理系统接口文档")
+                        .contact(new Contact().name("开发团队")));
+    }
+}
