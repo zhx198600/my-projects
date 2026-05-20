@@ -1,0 +1,26 @@
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-header {
+  background: #001529;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+}
+
+.app-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+.content-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.app-footer {
+  text-align: center;
+  background: #001529;
+  color: rgba(255, 255, 255, 0.65);
+}

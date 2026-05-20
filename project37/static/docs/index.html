@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工考勤管理系统 API 文档</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4a90d9;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .endpoint {
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .method {
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 3px;
+            margin-right: 15px;
+            color: white;
+            font-size: 14px;
+        }
+        .method.GET { background-color: #61affe; }
+        .method.POST { background-color: #49cc90; }
+        .method.PUT { background-color: #fca130; }
+        .method.DELETE { background-color: #f93e3e; }
+        .path {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 16px;
+            color: #333;
+        }
+        .description {
+            margin-left: auto;
+            color: #666;
+            font-size: 14px;
+        }
+        .endpoint-content {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: none;
+        }
+        .endpoint-content.active {
+            display: block;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        code {
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>员工考勤管理系统 API 文档</h1>
+        <div class="info">
+            <p><strong>版本:</strong> 1.0.0</p>
+            <p><strong>描述:</strong> 员工考勤管理系统的 RESTful API 接口文档</p>
+            <p><strong>认证方式:</strong> JWT Bearer Token，在请求头中添加: <code>Authorization: Bearer {token}</code></p>
+        </div>
+
+        <h2>API 接口</h2>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method POST">POST</span>
+                <span class="path">/api/auth/login</span>
+                <span class="description">用户登录</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">请求体:</div>
+                    <pre><code>{
+  "employee_no": "EMP001",
+  "password": "123456"
+}</code></pre>
+                </div>
+                <div class="section">
+                    <div class="section-title">响应示例:</div>
+                    <pre><code>{
+  "success": true,
+  "message": "登录成功",
+  "data": {
+    "token": "jwt_token_here",
+    "user": {
+      "id": 1,
+      "name": "张三",
+      "employee_no": "EMP001",
+      "role": "管理员"
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method GET">GET</span>
+                <span class="path">/api/auth/me</span>
+                <span class="description">获取当前用户信息</span>
+                <span class="tag">需要认证</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">响应示例:</div>
+                    <pre><code>{
+  "success": true,
+  "message": "获取成功",
+  "data": {
+    "id": 1,
+    "name": "张三",
+    "employee_no": "EMP001",
+    "role": "管理员"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method POST">POST</span>
+                <span class="path">/api/system/backup</span>
+                <span class="description">创建数据库备份</span>
+                <span class="tag">需要认证</span>
+                <span class="tag">仅管理员</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">响应示例:</div>
+                    <pre><code>{
+  "success": true,
+  "message": "数据库备份成功",
+  "data": {
+    "filename": "attendance_backup_20240101_120000.db"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method GET">GET</span>
+                <span class="path">/api/system/backups</span>
+                <span class="description">获取备份列表</span>
+                <span class="tag">需要认证</span>
+                <span class="tag">仅管理员</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">响应示例:</div>
+                    <pre><code>{
+  "success": true,
+  "message": "获取备份列表成功",
+  "data": {
+    "total": 2,
+    "backups": [
+      {
+        "filename": "attendance_backup_20240101_120000.db",
+        "size": 131072,
+        "created_at": "2024-01-01 12:00:00"
+      }
+    ]
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method GET">GET</span>
+                <span class="path">/api/system/backup/{filename}</span>
+                <span class="description">下载备份文件</span>
+                <span class="tag">需要认证</span>
+                <span class="tag">仅管理员</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">参数:</div>
+                    <pre><code>filename: 备份文件名</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <div class="endpoint-header" onclick="toggleContent(this)">
+                <span class="method DELETE">DELETE</span>
+                <span class="path">/api/system/backup/{filename}</span>
+                <span class="description">删除备份文件</span>
+                <span class="tag">需要认证</span>
+                <span class="tag">仅管理员</span>
+            </div>
+            <div class="endpoint-content">
+                <div class="section">
+                    <div class="section-title">响应示例:</div>
+                    <pre><code>{
+  "success": true,
+  "message": "删除备份文件成功"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <h3>更多接口</h3>
+        <p>其他接口包括：</p>
+        <ul>
+            <li><strong>部门管理:</strong> GET/POST/PUT/DELETE /api/departments</li>
+            <li><strong>员工管理:</strong> GET/POST/PUT/DELETE /api/employees</li>
+            <li><strong>考勤管理:</strong> POST /api/attendance/clock-in, clock-out, GET /api/attendance/status, history</li>
+            <li><strong>请假管理:</strong> POST/PUT /api/leave/request, GET /api/leave/my-requests</li>
+        </ul>
+    </div>
+
+    <script>
+        function toggleContent(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

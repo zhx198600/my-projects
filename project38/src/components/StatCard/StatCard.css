@@ -1,0 +1,172 @@
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: var(--card-border-radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--card-border-radius);
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.6),
+    rgba(0, 245, 212, 0.3),
+    rgba(0, 212, 255, 0.6)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: all var(--transition-normal);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 212, 255, 0.15) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--glow-strong);
+  border-color: var(--accent-cyan);
+}
+
+.stat-card:hover::before {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.9),
+    rgba(0, 245, 212, 0.6),
+    rgba(0, 212, 255, 0.9)
+  );
+}
+
+.stat-card:hover::after {
+  opacity: 1;
+  animation: cardGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes cardGlowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.stat-card-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-icon {
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 0 15px currentColor);
+  animation: float 3s ease-in-out infinite;
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 25px currentColor);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.stat-value-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Consolas', 'Monaco', monospace;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+  letter-spacing: 1px;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.stat-card:hover .stat-value {
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.9), 0 0 50px rgba(0, 212, 255, 0.5);
+  color: var(--accent-cyan);
+}
+
+.stat-unit {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.stat-trend.positive .trend-icon,
+.stat-trend.positive .trend-value {
+  color: #00f5d4;
+}
+
+.stat-trend.negative .trend-icon,
+.stat-trend.negative .trend-value {
+  color: #ff6b6b;
+}
+
+.trend-icon {
+  font-weight: 700;
+}
+
+.trend-value {
+  font-weight: 600;
+}
+
+.trend-label {
+  color: var(--text-muted);
+}

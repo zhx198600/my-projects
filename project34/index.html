@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 地球数据可视化</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="three-canvas"></canvas>
+    
+    <div class="header-panel">
+      <h1>🌍 全球数据可视化平台</h1>
+    </div>
+    
+    <div class="layer-panel">
+      <h3>📊 数据图层</h3>
+      <div class="layer-item">
+        <label class="switch">
+          <input type="checkbox" id="layer-weather" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="layer-label">🌤️ 气象数据</span>
+      </div>
+      <div class="layer-item">
+        <label class="switch">
+          <input type="checkbox" id="layer-earthquake">
+          <span class="slider"></span>
+        </label>
+        <span class="layer-label">🌋 地震数据</span>
+      </div>
+      <div class="layer-item">
+        <label class="switch">
+          <input type="checkbox" id="layer-wind">
+          <span class="slider"></span>
+        </label>
+        <span class="layer-label">💨 风场粒子</span>
+      </div>
+      <div class="layer-item">
+        <label class="switch">
+          <input type="checkbox" id="layer-ocean">
+          <span class="slider"></span>
+        </label>
+        <span class="layer-label">🌊 洋流数据</span>
+      </div>
+      <div class="layer-item">
+        <label class="switch">
+          <input type="checkbox" id="layer-nightlight" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="layer-label">✨ 夜光效果</span>
+      </div>
+    </div>
+
+    <div class="control-panel">
+      <h3>数据维度</h3>
+      <div class="btn-group">
+        <button class="control-btn active" data-dimension="temperature">
+          <span class="icon">🌡️</span>
+          <span class="label">平均气温</span>
+        </button>
+        <button class="control-btn" data-dimension="population">
+          <span class="icon">👥</span>
+          <span class="label">人口密度</span>
+        </button>
+        <button class="control-btn" data-dimension="carbon">
+          <span class="icon">🏭</span>
+          <span class="label">碳排放量</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="timeline-panel">
+      <div class="timeline-controls">
+        <button id="play-btn" class="play-btn">▶️</button>
+        <span id="year-display" class="year-display">2023</span>
+        <input type="range" id="timeline-slider" min="1990" max="2025" value="2023" class="timeline-slider">
+        <select id="speed-select" class="speed-select">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="legend-panel">
+      <h3 id="legend-title">平均气温</h3>
+      <div id="legend-gradient" class="legend-gradient temperature"></div>
+      <div class="legend-labels">
+        <span id="legend-min">低</span>
+        <span id="legend-max">高</span>
+      </div>
+      <div id="legend-unit" class="legend-unit">单位: °C</div>
+    </div>
+
+    <div id="data-panel" class="data-panel">
+      <div class="panel-header">
+        <h2 id="panel-country-name">国家名称</h2>
+        <button id="panel-close" class="close-btn">×</button>
+        <button id="panel-compare" class="compare-btn">➕ 对比</button>
+      </div>
+      <div class="panel-content">
+        <div class="data-item">
+          <span class="data-icon">🌡️</span>
+          <span class="data-label">平均气温</span>
+          <span id="panel-temperature" class="data-value">--</span>
+        </div>
+        <div class="data-item">
+          <span class="data-icon">👥</span>
+          <span class="data-label">人口密度</span>
+          <span id="panel-population" class="data-value">--</span>
+        </div>
+        <div class="data-item">
+          <span class="data-icon">🏭</span>
+          <span class="data-label">年碳排放量</span>
+          <span id="panel-carbon" class="data-value">--</span>
+        </div>
+      </div>
+      <div id="compare-section" class="compare-section">
+        <h4>📊 数据对比</h4>
+        <div id="compare-list" class="compare-list"></div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

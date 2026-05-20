@@ -1,0 +1,8 @@
+flask
+flask-cors
+flask-sqlalchemy
+paddleocr
+pypdf2
+pandas
+openpyxl
+pillow

@@ -1,0 +1,175 @@
+.traffic-map-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: transparent;
+  border-radius: var(--panel-border-radius);
+  overflow: hidden;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.traffic-map-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+  animation: mapBgPulse 6s ease-in-out infinite;
+}
+
+@keyframes mapBgPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.map-chart {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.traffic-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(10, 22, 40, 0.9);
+  border: 1px solid #00f2ff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  z-index: 10;
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+}
+
+.legend-title {
+  color: #00f2ff;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 16px;
+  height: 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.subway-legend {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.subway-legend::-webkit-scrollbar {
+  width: 4px;
+}
+
+.subway-legend::-webkit-scrollbar-track {
+  background: rgba(0, 242, 255, 0.1);
+  border-radius: 2px;
+}
+
+.subway-legend::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 255, 0.5);
+  border-radius: 2px;
+}
+
+.subway-legend .legend-item {
+  justify-content: space-between;
+}
+
+.legend-status {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.legend-status.normal {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.5);
+}
+
+.legend-status.delayed {
+  background: rgba(255, 221, 0, 0.2);
+  color: #ffdd00;
+  border: 1px solid rgba(255, 221, 0, 0.5);
+}
+
+.legend-status.suspended {
+  background: rgba(255, 51, 51, 0.2);
+  color: #ff3333;
+  border: 1px solid rgba(255, 51, 51, 0.5);
+}
+
+.reset-view-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 22, 40, 0.95);
+  border: 1px solid #00f2ff;
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #00f2ff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+}
+
+.reset-view-button:hover {
+  background: rgba(0, 242, 255, 0.15);
+  box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.reset-view-button:active {
+  transform: translateY(0);
+}
+
+.district-name-badge {
+  position: absolute;
+  top: 20px;
+  right: 200px;
+  background: rgba(10, 22, 40, 0.95);
+  border: 1px solid #00ff88;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: #00ff88;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 100;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+  letter-spacing: 1px;
+}

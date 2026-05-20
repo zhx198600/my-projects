@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在线考核</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link">← 返回首页</a>
+    
+    <div class="header">
+      <h1>安全生产知识考核</h1>
+      <p>共10题，每题10分，70分及格</p>
+    </div>
+
+    <div class="progress-info">
+      <span class="progress-text">答题进度</span>
+      <span class="progress-percent" id="progressPercent">0/10</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+
+    <div id="examContent">
+    </div>
+
+    <button id="submitBtn" class="btn btn-primary">提交答卷</button>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="loading" class="loading">加载中...</div>
+
+  <script src="js/common.js"></script>
+  <script>
+    initExamPage();
+  </script>
+</body>
+</html>

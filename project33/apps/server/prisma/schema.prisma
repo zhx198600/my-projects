@@ -1,0 +1,290 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  name        String
+  description String?
+  permissions String    @default("[]")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  type      String
+  parentId  String?
+  level     Int      @default(1)
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent   Organization?    @relation("OrgHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Organization[]   @relation("OrgHierarchy")
+  positions Position[]
+  users     UserPosition[]
+
+  @@map("organizations")
+}
+
+model Position {
+  id             String   @id @default(uuid())
+  name           String
+  code           String   @unique
+  organizationId String
+  level          Int      @default(1)
+  sort           Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users        UserPosition[]
+  workflowNodes WorkflowNode[] @relation("NodePosition")
+
+  @@map("positions")
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  phone       String?  @unique
+  studentId   String?  @unique
+  employeeId  String?  @unique
+  name        String?
+  password    String
+  avatar      String?
+  gender      String?
+  birthday    DateTime?
+  enabled     Boolean  @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  supervisorId String?
+
+  supervisor  User?          @relation("UserSupervisor", fields: [supervisorId], references: [id], onDelete: SetNull)
+  subordinates User[]        @relation("UserSupervisor")
+  userRoles    UserRole[]
+  positions    UserPosition[]
+  createdForms FormDefinition[] @relation("FormCreatedBy")
+  updatedForms FormDefinition[] @relation("FormUpdatedBy")
+  createdWorkflows WorkflowDefinition[] @relation("WorkflowCreator")
+  assignedWorkflowNodes WorkflowNode[] @relation("NodeAssignee")
+  startedProcesses ProcessInstance[]
+  nodeInstances ProcessNodeInstance[]
+  approvals ProcessApproval[]
+
+  @@map("users")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model UserPosition {
+  id              String   @id @default(uuid())
+  userId          String
+  organizationId  String
+  positionId      String?
+  isPrimary       Boolean  @default(true)
+  startDate       DateTime?
+  endDate         DateTime?
+  createdAt       DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  position     Position?     @relation(fields: [positionId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, organizationId, positionId])
+  @@map("user_positions")
+}
+
+model FormDefinition {
+  id          String              @id @default(uuid())
+  name        String
+  code        String?             @unique
+  description String?
+  status      String              @default("draft")
+  config      String              @default("{}")
+  createdById String?
+  updatedById String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  createdBy User?                 @relation("FormCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User?                 @relation("FormUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  workflows WorkflowDefinition[]  @relation("WorkflowForm")
+
+  @@map("form_definitions")
+}
+
+model NodeFieldPermission {
+  id         String   @id @default(uuid())
+  nodeId     String
+  fieldName  String
+  permission String   @default("EDITABLE")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  node WorkflowNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@unique([nodeId, fieldName])
+  @@map("node_field_permissions")
+}
+
+model WorkflowDefinition {
+  id          String    @id @default(uuid())
+  name        String
+  code        String    @unique
+  description String?
+  version     Int       @default(1)
+  isPublished Boolean   @default(false)
+  formSchema  String    @default("{}")
+  formId      String?
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy         User              @relation("WorkflowCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  form              FormDefinition?   @relation("WorkflowForm", fields: [formId], references: [id], onDelete: SetNull)
+  nodes             WorkflowNode[]
+  edges             WorkflowEdge[]
+  processInstances  ProcessInstance[]
+
+  @@map("workflow_definitions")
+}
+
+model WorkflowNode {
+  id             String           @id @default(uuid())
+  workflowId     String
+  name           String
+  type           String
+  x              Int              @default(0)
+  y              Int              @default(0)
+  properties     String           @default("{}")
+  positionId     String?
+  assigneeId     String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  workflow         WorkflowDefinition    @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  position         Position?             @relation("NodePosition", fields: [positionId], references: [id], onDelete: SetNull)
+  assignee         User?                 @relation("NodeAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  conditions       WorkflowCondition[]
+  fieldPermissions NodeFieldPermission[]
+  outgoing         WorkflowEdge[]        @relation("EdgeSource")
+  incoming         WorkflowEdge[]        @relation("EdgeTarget")
+
+  @@map("workflow_nodes")
+}
+
+model WorkflowEdge {
+  id              String             @id @default(uuid())
+  workflowId      String
+  sourceId        String
+  targetId        String
+  conditionExpression String?
+  priority        Int                @default(0)
+  createdAt       DateTime           @default(now())
+
+  workflow WorkflowDefinition @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  source   WorkflowNode       @relation("EdgeSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target   WorkflowNode       @relation("EdgeTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@map("workflow_edges")
+}
+
+model WorkflowCondition {
+  id               String    @id @default(uuid())
+  nodeId           String
+  fieldName        String
+  operator         String
+  value            String?
+  logicalOperator  String    @default("AND")
+  priority         Int       @default(0)
+  groupId          String?
+  createdAt        DateTime  @default(now())
+
+  node WorkflowNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@map("workflow_conditions")
+}
+
+model ProcessInstance {
+  id                String    @id @default(uuid())
+  workflowId        String
+  title             String
+  status            String    @default("PENDING")
+  formData          String    @default("{}")
+  startedById       String
+  currentNodeId     String?
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  workflow  WorkflowDefinition   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  startedBy User                 @relation(fields: [startedById], references: [id], onDelete: Cascade)
+  nodeInstances ProcessNodeInstance[]
+  approvals ProcessApproval[]
+
+  @@map("process_instances")
+}
+
+model ProcessNodeInstance {
+  id                String    @id @default(uuid())
+  processInstanceId String
+  nodeId            String
+  nodeName          String
+  nodeType          String
+  status            String    @default("PENDING")
+  assigneeId        String?
+  properties        String    @default("{}")
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  processInstance ProcessInstance @relation(fields: [processInstanceId], references: [id], onDelete: Cascade)
+  assignee        User?           @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
+  approvals       ProcessApproval[]
+
+  @@map("process_node_instances")
+}
+
+model ProcessApproval {
+  id                  String         @id @default(uuid())
+  processInstanceId   String
+  nodeInstanceId      String
+  approverId          String
+  action              String
+  comment             String?
+  approvedAt          DateTime?
+  createdAt           DateTime       @default(now())
+
+  processInstance ProcessInstance   @relation(fields: [processInstanceId], references: [id], onDelete: Cascade)
+  nodeInstance    ProcessNodeInstance @relation(fields: [nodeInstanceId], references: [id], onDelete: Cascade)
+  approver        User              @relation(fields: [approverId], references: [id], onDelete: Cascade)
+
+  @@map("process_approvals")
+}

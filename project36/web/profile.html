@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <a href="index.html" class="back-btn">← 返回首页</a>
+      <h1 class="page-title">个人中心</h1>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-info">
+          <h2 class="profile-name" id="profileName">--</h2>
+          <p class="profile-phone" id="profilePhone">--</p>
+        </div>
+      </div>
+      
+      <div class="info-section">
+        <h3 class="section-title">基本信息</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-label">姓名</span>
+            <span class="info-value" id="infoName">--</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">身份证号</span>
+            <span class="info-value" id="infoIdCard">--</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">联系电话</span>
+            <span class="info-value" id="infoPhone">--</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">工种</span>
+            <span class="info-value" id="infoJob">--</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">所属项目</span>
+            <span class="info-value" id="infoProject">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-record-card">
+      <h3 class="section-title">流程完成记录</h3>
+      <div class="record-list">
+        <div class="record-item" id="record1">
+          <div class="record-icon completed">✓</div>
+          <div class="record-content">
+            <div class="record-title">信息登记</div>
+            <div class="record-time" id="record1Time">--</div>
+          </div>
+          <div class="record-status completed">已完成</div>
+        </div>
+        <div class="record-item" id="record2">
+          <div class="record-icon completed">✓</div>
+          <div class="record-content">
+            <div class="record-title">安全培训</div>
+            <div class="record-time" id="record2Time">--</div>
+          </div>
+          <div class="record-status completed">已完成</div>
+        </div>
+        <div class="record-item" id="record3">
+          <div class="record-icon completed">✓</div>
+          <div class="record-content">
+            <div class="record-title">在线考核</div>
+            <div class="record-time" id="record3Time">--</div>
+            <div class="record-score" id="record3Score">--</div>
+          </div>
+          <div class="record-status completed">已完成</div>
+        </div>
+        <div class="record-item" id="record4">
+          <div class="record-icon pending">○</div>
+          <div class="record-content">
+            <div class="record-title">责任书签署</div>
+            <div class="record-time" id="record4Time">--</div>
+          </div>
+          <div class="record-status pending">未完成</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overall-status-card">
+      <h3 class="section-title">总体状态</h3>
+      <div class="status-overview">
+        <div class="status-circle" id="statusCircle">
+          <span class="status-percent" id="statusPercent">75%</span>
+        </div>
+        <div class="status-desc">
+          <p id="statusText">已完成 3/4 个流程</p>
+          <p class="status-hint">完成全部流程即可正式上岗</p>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="window.location.href='index.html'">返回首页继续完成</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="loading" class="loading">加载中...</div>
+
+  <script src="js/common.js"></script>
+  <script>
+    async function loadProfile() {
+      try {
+        const result = await apiRequest('/users/info');
+        if (result.success && result.data) {
+          renderProfile(result.data);
+        } else {
+          renderDemoProfile();
+        }
+      } catch (error) {
+        console.error('加载个人中心失败', error);
+        renderDemoProfile();
+      }
+    }
+
+    function renderDemoProfile() {
+      const demoData = {
+        name: '张三',
+        idCard: '110***********1234',
+        phone: '138****8888',
+        job: '建筑工人',
+        project: 'XX大厦建设项目',
+        infoCompleted: true,
+        infoCompletedTime: '2024-01-15 10:30:00',
+        trainingCompleted: true,
+        trainingCompletedTime: '2024-01-16 14:20:00',
+        examScore: 90,
+        examCompletedTime: '2024-01-17 09:15:00',
+        agreementSigned: false,
+        agreementSignedTime: null
+      };
+      renderProfile(demoData);
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

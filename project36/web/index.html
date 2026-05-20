@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>农民工上岗登记</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>农民工上岗登记系统</h1>
+      <p>安全培训 · 考核认证 · 规范上岗</p>
+    </div>
+
+    <div class="user-info-card" id="userInfoCard" style="display: none;">
+      <div class="user-info-header">
+        <div class="user-avatar">👤</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">--</div>
+          <div class="user-id" id="userIdCard">身份证号：--</div>
+        </div>
+        <a href="profile.html" class="profile-link">查看详情 →</a>
+      </div>
+    </div>
+
+    <div class="progress-card" id="progressCard" style="display: none;">
+      <div class="progress-header">
+        <div class="progress-title">上岗登记进度</div>
+        <div class="progress-percent" id="overallProgress">0%</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-steps">
+        <div class="step-item" id="step1">
+          <div class="step-icon">📝</div>
+          <div class="step-content">
+            <div class="step-title">信息登记</div>
+            <div class="step-status" id="step1Status">未完成</div>
+          </div>
+          <button class="step-btn" id="step1Btn" onclick="goToStep('register.html')">去登记</button>
+        </div>
+        <div class="step-item" id="step2">
+          <div class="step-icon">📚</div>
+          <div class="step-content">
+            <div class="step-title">安全培训</div>
+            <div class="step-status" id="step2Status">未完成</div>
+          </div>
+          <button class="step-btn" id="step2Btn" onclick="goToStep('training.html')">去培训</button>
+        </div>
+        <div class="step-item" id="step3">
+          <div class="step-icon">✅</div>
+          <div class="step-content">
+            <div class="step-title">考核通过</div>
+            <div class="step-status" id="step3Status">未完成</div>
+          </div>
+          <button class="step-btn" id="step3Btn" onclick="goToStep('exam.html')">去考核</button>
+        </div>
+        <div class="step-item" id="step4">
+          <div class="step-icon">📋</div>
+          <div class="step-content">
+            <div class="step-title">责任书签署</div>
+            <div class="step-status" id="step4Status">未完成</div>
+          </div>
+          <button class="step-btn" id="step4Btn" onclick="goToStep('agreement.html')">去签署</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-grid" id="menuGrid">
+      <a href="register.html" class="menu-item">
+        <div class="icon">📝</div>
+        <div class="title">上岗登记</div>
+      </a>
+      <a href="training.html" class="menu-item">
+        <div class="icon">📚</div>
+        <div class="title">安全培训</div>
+      </a>
+      <a href="exam.html" class="menu-item">
+        <div class="icon">✅</div>
+        <div class="title">在线考核</div>
+      </a>
+      <a href="agreement.html" class="menu-item">
+        <div class="icon">📋</div>
+        <div class="title">责任书</div>
+      </a>
+    </div>
+
+    <div class="admin-section" style="margin-top: 30px;">
+      <button class="btn btn-secondary btn-block" onclick="window.location.href='worker-list.html'">
+        📋 在册登记人员查看
+      </button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="loading" class="loading">加载中...</div>
+
+  <script src="js/common.js"></script>
+  <script>
+    function goToStep(url) {
+      window.location.href = url;
+    }
+
+    async function loadStatus() {
+      try {
+        const result = await apiRequest('/users/status');
+        if (result.success && result.data) {
+          renderStatus(result.data);
+        } else {
+          renderDemoStatus();
+        }
+      } catch (error) {
+        console.error('加载状态失败', error);
+        renderDemoStatus();
+      }
+    }
+
+    function renderDemoStatus() {
+      const demoData = {
+        name: '张三',
+        idCard: '110***********1234',
+        phone: '138****8888',
+        infoCompleted: true,
+        infoCompletedTime: '2024-01-15 10:30:00',
+        trainingCompleted: true,
+        trainingCompletedTime: '2024-01-16 14:20:00',
+        examScore: 90,
+        examCompletedTime: '2024-01-17 09:15:00',
+        agreementSigned: false,
+        agreementSignedTime: null
+      };
+      renderStatus(demoData);
+    }
+
+    loadStatus();
+  </script>
+</body>
+</html>

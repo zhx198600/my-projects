@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>安全生产培训</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back-link">← 返回首页</a>
+    
+    <div class="header">
+      <h1>安全生产岗前培训</h1>
+      <p>请认真阅读以下安全知识，完成培训后进入考核</p>
+    </div>
+
+    <div class="progress-info">
+      <span class="progress-text">学习进度</span>
+      <span class="progress-percent" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+    </div>
+
+    <div class="training-content" id="trainingContent">
+      <div class="chapter" id="chapter1">
+        <div class="chapter-title">
+          <span class="chapter-icon">📋</span>
+          <h2>第一章 安全生产法规</h2>
+        </div>
+        <div class="chapter-content">
+          <h3>1.1 《中华人民共和国安全生产法》核心要点</h3>
+          <p>《安全生产法》是我国安全生产领域的基本法律，于2002年颁布实施，2021年完成最新修订。</p>
+          
+          <div class="highlight-box">
+            <h4>从业人员的权利：</h4>
+            <ul>
+              <li>获得安全保障、工伤保险和民事赔偿的权利</li>
+              <li>得知危险因素、防范措施和事故应急措施的权利</li>
+              <li>对本单位安全生产的批评、检举和控告的权利</li>
+              <li>拒绝违章指挥和强令冒险作业的权利</li>
+              <li>紧急情况下的停止作业和紧急撤离的权利</li>
+            </ul>
+          </div>
+
+          <div class="highlight-box warning">
+            <h4>从业人员的义务：</h4>
+            <ul>
+              <li>遵章守规、服从管理的义务</li>
+              <li>正确佩戴和使用劳动防护用品的义务</li>
+              <li>接受安全培训，掌握安全生产技能的义务</li>
+              <li>发现事故隐患或者其他不安全因素及时报告的义务</li>
+            </ul>
+          </div>
+
+          <h3>1.2 安全生产方针</h3>
+          <p>我国安全生产工作坚持"安全第一、预防为主、综合治理"的方针，从源头上防范化解重大安全风险。</p>
+          
+          <h3>1.3 法律责任</h3>
+          <p>生产经营单位的从业人员不落实岗位安全责任，不服从管理，违反安全生产规章制度或者操作规程的，由生产经营单位给予批评教育，依照有关规章制度给予处分；构成犯罪的，依照刑法有关规定追究刑事责任。</p>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter2">
+        <div class="chapter-title">
+          <span class="chapter-icon">🛡️</span>
+          <h2>第二章 安全操作规程</h2>
+        </div>
+        <div class="chapter-content">
+          <h3>2.1 施工现场基本安全规定</h3>
+          <div class="safety-list">
+            <div class="safety-item">
+              <span class="safety-icon">✅</span>
+              <div class="safety-text">
+                <strong>进入现场必须佩戴安全帽</strong>
+                <p>安全帽是保护头部的重要防护用品，进入施工现场必须正确佩戴，系好帽带，严禁抛掷或用作坐垫。</p>
+              </div>
+            </div>
+            <div class="safety-item">
+              <span class="safety-icon">✅</span>
+              <div class="safety-text">
+                <strong>高处作业必须系安全带</strong>
+                <p>凡在坠落高度基准面2米以上（含2米）有可能坠落的高处进行作业，必须系好合格的安全带，做到高挂低用。</p>
+              </div>
+            </div>
+            <div class="safety-item">
+              <span class="safety-icon">✅</span>
+              <div class="safety-text">
+                <strong>特种作业必须持证上岗</strong>
+                <p>电工、焊工、起重工、架子工等特种作业人员，必须经过专门的安全技术培训并考核合格，取得特种作业操作证后方可上岗作业。</p>
+              </div>
+            </div>
+            <div class="safety-item">
+              <span class="safety-icon">❌</span>
+              <div class="safety-text">
+                <strong>严禁酒后上岗</strong>
+                <p>酒后作业会严重影响判断力和反应能力，极易发生安全事故，严禁酒后或带病上岗作业。</p>
+              </div>
+            </div>
+            <div class="safety-item">
+              <span class="safety-icon">❌</span>
+              <div class="safety-text">
+                <strong>严禁擅自拆除安全设施</strong>
+                <p>安全防护设施是保障作业安全的重要屏障，严禁擅自拆除、移动安全防护设施，确需拆除的须经项目负责人批准。</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>2.2 用电安全操作规程</h3>
+          <ul>
+            <li>临时用电必须由专业电工操作，严禁私拉乱接电线</li>
+            <li>电气设备必须接地良好，配备漏电保护器</li>
+            <li>严禁用湿手触摸开关、插座等电气设备</li>
+            <li>发现电线破损、老化应立即报告，由专业人员处理</li>
+            <li>下班前必须切断工作区域的电源</li>
+          </ul>
+
+          <h3>2.3 机械设备安全操作规程</h3>
+          <ul>
+            <li>操作前必须检查设备是否正常，安全装置是否齐全有效</li>
+            <li>严格按照设备操作规程操作，严禁违章作业</li>
+            <li>机械设备运转时严禁进行维修保养作业</li>
+            <li>作业结束后必须切断电源，清理作业现场</li>
+            <li>发现设备异常情况应立即停机检查，排除故障后方可继续使用</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter3">
+        <div class="chapter-title">
+          <span class="chapter-icon">👷</span>
+          <h2>第三章 个人防护用品使用</h2>
+        </div>
+        <div class="chapter-content">
+          <h3>3.1 防护用品分类及使用要求</h3>
+          
+          <div class="ppe-grid">
+            <div class="ppe-card">
+              <div class="ppe-icon">⛑️</div>
+              <h4>安全帽</h4>
+              <p>进入施工现场必须佩戴，防止物体打击伤害。定期检查，发现裂纹、破损立即更换。</p>
+            </div>
+            <div class="ppe-card">
+              <div class="ppe-icon">🪢</div>
+              <h4>安全带</h4>
+              <p>高处作业必备，高挂低用。使用前检查绳索、挂钩是否完好，严禁打结使用。</p>
+            </div>
+            <div class="ppe-card">
+              <div class="ppe-icon">🥽</div>
+              <h4>防护眼镜</h4>
+              <p>焊接、切割、打磨等作业必须佩戴，防止异物、强光伤害眼睛。</p>
+            </div>
+            <div class="ppe-card">
+              <div class="ppe-icon">🧤</div>
+              <h4>防护手套</h4>
+              <p>根据作业类型选择合适手套。电气作业必须戴绝缘手套，焊接作业戴耐火手套。</p>
+            </div>
+            <div class="ppe-card">
+              <div class="ppe-icon">👟</div>
+              <h4>防护鞋</h4>
+              <p>施工现场必须穿防滑、防砸安全鞋。电气作业穿绝缘鞋，高处作业穿软底防滑鞋。</p>
+            </div>
+            <div class="ppe-card">
+              <div class="ppe-icon">😷</div>
+              <h4>防尘口罩</h4>
+              <p>粉尘作业环境必须佩戴，防止吸入有害粉尘。定期更换，保持清洁。</p>
+            </div>
+          </div>
+
+          <h3>3.2 防护用品维护保养</h3>
+          <ul>
+            <li>个人防护用品应专人专用，妥善保管</li>
+            <li>定期检查防护用品的完好情况，发现损坏及时更换</li>
+            <li>防护用品应存放在干燥、通风、清洁的地方</li>
+            <li>安全帽、安全带等有使用期限，到期必须更换</li>
+            <li>严禁使用过期、损坏或不合格的防护用品</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter4">
+        <div class="chapter-title">
+          <span class="chapter-icon">📢</span>
+          <h2>第四章 典型事故案例分析</h2>
+        </div>
+        <div class="chapter-content">
+          <h3>4.1 高处坠落事故案例</h3>
+          <div class="case-box">
+            <h4>事故经过：</h4>
+            <p>某建筑工地，工人王某在3楼进行外墙粉刷作业时，未系安全带，脚下踩空从10米高处坠落，经抢救无效死亡。</p>
+            <h4>事故原因：</h4>
+            <ul>
+              <li>当事人安全意识淡薄，高处作业不系安全带</li>
+              <li>现场安全管理不到位，安全员巡查不力</li>
+              <li>安全技术交底流于形式，未落实到位</li>
+            </ul>
+            <h4>事故教训：</h4>
+            <p class="lesson">高处作业必须100%系好安全带，这是生命的保护绳。安全管理必须严格，不能有丝毫松懈。</p>
+          </div>
+
+          <h3>4.2 物体打击事故案例</h3>
+          <div class="case-box">
+            <h4>事故经过：</h4>
+            <p>某工地，工人李某在地面作业时，被楼上掉落的一根钢管击中头部，因未佩戴安全帽，造成重伤。</p>
+            <h4>事故原因：</h4>
+            <ul>
+              <li>受害者进入施工现场未按规定佩戴安全帽</li>
+              <li>高处作业下方未设置警戒区，无人监护</li>
+              <li>临边堆放物料未采取防坠落措施</li>
+            </ul>
+            <h4>事故教训：</h4>
+            <p class="lesson">安全帽是保护头部的最后一道防线，进入现场必须正确佩戴。高处作业下方必须设置警戒区。</p>
+          </div>
+
+          <h3>4.3 触电事故案例</h3>
+          <div class="case-box">
+            <h4>事故经过：</h4>
+            <p>某车间，工人张某在移动电风扇时，因电线绝缘层破损漏电，触电身亡。</p>
+            <h4>事故原因：</h4>
+            <ul>
+              <li>电气设备缺乏定期维护检查，电线老化破损</li>
+              <li>设备未安装漏电保护器</li>
+              <li>当事人缺乏用电安全知识</li>
+            </ul>
+            <h4>事故教训：</h4>
+            <p class="lesson">电气设备必须定期检查维护，按规定安装漏电保护器。从业人员必须掌握基本用电安全知识。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="chapter" id="chapter5">
+        <div class="chapter-title">
+          <span class="chapter-icon">🚑</span>
+          <h2>第五章 应急处理与急救知识</h2>
+        </div>
+        <div class="chapter-content">
+          <h3>5.1 事故报告程序</h3>
+          <div class="flow-box">
+            <div class="flow-step">
+              <span class="step-number">1</span>
+              <div class="step-text">
+                <strong>立即停止作业</strong>
+                <p>发生事故后，立即停止相关作业，确保现场安全</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span class="step-number">2</span>
+              <div class="step-text">
+                <strong>抢救伤员</strong>
+                <p>在确保安全的前提下，第一时间抢救受伤人员</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span class="step-number">3</span>
+              <div class="step-text">
+                <strong>报告现场负责人</strong>
+                <p>立即向现场安全员或项目负责人报告事故情况</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span class="step-number">4</span>
+              <div class="step-text">
+                <strong>保护事故现场</strong>
+                <p>保护好事故现场，需要移动现场物品时，应做出标记</p>
+              </div>
+            </div>
+          </div>
+
+          <h3>5.2 基本急救知识</h3>
+          
+          <h4>止血方法：</h4>
+          <ul>
+            <li><strong>指压止血法：</strong>用手指按压伤口近心端的动脉血管</li>
+            <li><strong>加压包扎止血法：</strong>用干净纱布覆盖伤口，再用绷带加压包扎</li>
+            <li><strong>止血带止血法：</strong>四肢大出血时使用，每40-50分钟放松一次</li>
+          </ul>
+
+          <h4>心肺复苏（CPR）要点：</h4>
+          <div class="cpr-box">
+            <ol>
+              <li>判断意识：轻拍患者双肩，呼叫患者</li>
+              <li>呼救求援：立即拨打120急救电话</li>
+              <li>胸外按压：位置在两乳头连线中点，深度5-6cm，频率100-120次/分钟</li>
+              <li>人工呼吸：每30次按压进行2次人工呼吸</li>
+              <li>持续进行，直到急救人员到达或患者恢复自主呼吸</li>
+            </ol>
+          </div>
+
+          <h3>5.3 应急逃生常识</h3>
+          <ul>
+            <li>熟悉作业现场的应急逃生路线和安全出口位置</li>
+            <li>火灾逃生时用湿毛巾捂住口鼻，低姿势匍匐前进</li>
+            <li>遇到紧急情况保持冷静，听从现场指挥人员疏导</li>
+            <li>优先保障人身安全，不要贪恋财物</li>
+            <li>禁止乘坐电梯逃生，应选择安全通道</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter-nav" id="chapterNav">
+      <div class="nav-title">目录导航</div>
+      <div class="nav-list">
+        <a href="#chapter1" class="nav-item" data-chapter="1">第一章 安全生产法规</a>
+        <a href="#chapter2" class="nav-item" data-chapter="2">第二章 安全操作规程</a>
+        <a href="#chapter3" class="nav-item" data-chapter="3">第三章 个人防护用品使用</a>
+        <a href="#chapter4" class="nav-item" data-chapter="4">第四章 典型事故案例分析</a>
+        <a href="#chapter5" class="nav-item" data-chapter="5">第五章 应急处理与急救知识</a>
+      </div>
+    </div>
+
+    <div class="complete-section">
+      <div class="checkbox-group">
+        <input type="checkbox" id="confirmRead" name="confirmRead" disabled>
+        <label for="confirmRead">我已认真阅读并理解以上全部安全培训内容，承诺严格遵守各项安全规定</label>
+      </div>
+
+      <button id="completeBtn" class="btn btn-primary btn-large" disabled>完成培训，进入考核</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <div id="loading" class="loading">加载中...</div>
+
+  <script src="js/common.js"></script>
+  <script>
+    initTrainingPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+.react-flow-node-start {
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #22c55e, #16a34a);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.react-flow-node-start:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.react-flow-node-start.selected {
+  box-shadow: 0 0 0 4px rgba(134, 239, 172, 0.4);
+  transform: scale(1.05);
+}
+.react-flow-node-end {
+  padding: 12px 24px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #ef4444, #dc2626);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.react-flow-node-end:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.react-flow-node-end.selected {
+  box-shadow: 0 0 0 4px rgba(252, 165, 165, 0.4);
+  transform: scale(1.05);
+}
+.react-flow-node-approval {
+  min-width: 160px;
+  border-radius: 12px;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.react-flow-node-approval:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.react-flow-node-approval.selected {
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.4);
+  transform: scale(1.05);
+}
+.react-flow-node-condition {
+  min-width: 140px;
+  transition: all 0.3s ease;
+}
+.react-flow-node-condition.selected {
+  transform: scale(1.05);
+}
+.react-flow-node-condition .node-content {
+  background: linear-gradient(to right, #eab308, #ca8a04);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 24px 16px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.react-flow-node-condition.selected .node-content {
+  box-shadow: 0 0 0 4px rgba(253, 224, 71, 0.4);
+}
+.react-flow-node-condition .node-content:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.react-flow-node-serial {
+  min-width: 140px;
+  border-radius: 8px;
+  background: linear-gradient(to right, #a855f7, #9333ea);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.react-flow-node-serial:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.react-flow-node-serial.selected {
+  box-shadow: 0 0 0 4px rgba(196, 181, 253, 0.4);
+  transform: scale(1.05);
+}
+.node-flex-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.node-description {
+  font-size: 12px;
+  color: rgba(219, 234, 254, 1);
+  margin-top: 4px;
+}
+.svg-icon {
+  width: 20px;
+  height: 20px;
+}
+.svg-icon-lg {
+  width: 24px;
+  height: 24px;
+}
+.condition-node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: white !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: #3b82f6 !important;
+}
+.react-flow__handle-left,
+.react-flow__handle-top {
+  border-color: #3b82f6 !important;
+}
+.react-flow__handle-right,
+.react-flow__handle-bottom {
+  border-color: #3b82f6 !important;
+}
+.flow-designer-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: #f9fafb;
+}
+.flow-designer-sidebar {
+  width: 288px;
+  background-color: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.flow-designer-sidebar-section {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.flow-designer-sidebar-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+.flow-designer-sidebar-subtitle {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #4b5563;
+}
+.flow-designer-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.flow-designer-input:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: transparent;
+}
+.flow-designer-node-item {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.flow-designer-node-item:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.flow-designer-workflow-item {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.flow-designer-workflow-item:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.flow-designer-workflow-item.active {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.flow-designer-footer {
+  padding: 16px;
+  margin-top: auto;
+}
+.flow-designer-btn {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 8px;
+}
+.flow-designer-btn-gray {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+.flow-designer-btn-gray:hover {
+  background-color: #d1d5db;
+}
+.flow-designer-btn-green {
+  background-color: #22c55e;
+  color: white;
+}
+.flow-designer-btn-green:hover {
+  background-color: #16a34a;
+}
+.flow-designer-btn-green:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.flow-designer-btn-emerald {
+  background-color: #10b981;
+  color: white;
+  flex: 1;
+}
+.flow-designer-btn-emerald:hover {
+  background-color: #059669;
+}
+.flow-designer-btn-emerald:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.flow-designer-btn-orange {
+  background-color: #f97316;
+  color: white;
+  flex: 1;
+}
+.flow-designer-btn-orange:hover {
+  background-color: #ea580c;
+}
+.flow-designer-btn-orange:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.flow-designer-btn-indigo {
+  background-color: #6366f1;
+  color: white;
+}
+.flow-designer-btn-indigo:hover {
+  background-color: #4f46e5;
+}
+.flow-designer-btn-indigo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.flow-designer-btn-purple {
+  background-color: #a855f7;
+  color: white;
+}
+.flow-designer-btn-purple:hover {
+  background-color: #9333ea;
+}
+.flow-designer-btn-purple:disabled {
+  opacity: 0.5;
+}
+.flow-designer-btn-red {
+  background-color: #ef4444;
+  color: white;
+}
+.flow-designer-btn-red:hover {
+  background-color: #dc2626;
+}
+.flow-designer-btn-red:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.flow-designer-btn-row {
+  display: flex;
+  gap: 8px;
+}
+.flow-designer-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.flow-designer-toolbar {
+  height: 48px;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 16px;
+}
+.flow-designer-toolbar-item {
+  font-size: 14px;
+  color: #6b7280;
+}
+.flow-designer-toolbar-blue {
+  font-size: 14px;
+  color: #2563eb;
+}
+.flow-designer-toolbar-purple {
+  font-size: 14px;
+  color: #9333ea;
+}
+.flow-designer-content {
+  flex: 1;
+  display: flex;
+}
+.flow-designer-canvas {
+  flex: 1;
+}
+.flow-designer-validation-panel {
+  width: 320px;
+  padding: 16px;
+  border-left: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  overflow-y: auto;
+}
+.flow-designer-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.flow-designer-panel-title {
+  font-weight: bold;
+  color: #1f2937;
+}
+.flow-designer-panel-close {
+  color: #9ca3af;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+.flow-designer-panel-close:hover {
+  color: #4b5563;
+}
+.flow-designer-config-panel {
+  width: 320px;
+  padding: 16px;
+  border-left: 1px solid #e5e7eb;
+  background-color: white;
+  height: 100%;
+  overflow-y: auto;
+}
+.flow-designer-config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.flow-designer-config-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+}
+.flow-designer-info-card {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+.flow-designer-form-item {
+  margin-bottom: 16px;
+}
+.flow-designer-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+.flow-designer-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+.flow-designer-textarea:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: transparent;
+}
+.flow-designer-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.flow-designer-select:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: transparent;
+}
+.flow-designer-field-perms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.flow-designer-field-perms-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #374151;
+}
+.flow-designer-btn-xs {
+  font-size: 12px;
+  padding: 4px 8px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+.flow-designer-btn-xs:hover {
+  background-color: #2563eb;
+}
+.flow-designer-field-card {
+  padding: 8px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.flow-designer-field-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+}
+.flow-designer-perms-row {
+  display: flex;
+  gap: 8px;
+}
+.flow-designer-perm-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.flow-designer-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.flow-designer-modal {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 400px;
+  padding: 24px;
+  margin: 0 16px;
+}
+.flow-designer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.flow-designer-modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+}
+.flow-designer-modal-close {
+  color: #9ca3af;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}
+.flow-designer-modal-close:hover {
+  color: #4b5563;
+}
+.flow-designer-modal-info {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px;
+}
+.flow-designer-modal-info-text {
+  font-size: 14px;
+  color: #1d4ed8;
+}
+.flow-designer-modal-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+.flow-designer-modal-lg {
+  max-width: 672px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.flow-designer-modal-content {
+  flex: 1;
+  overflow-y: auto;
+}
+.flow-designer-empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: #6b7280;
+}
+.flow-designer-version-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.flow-designer-version-card:hover {
+  border-color: #93c5fd;
+  background-color: #eff6ff;
+}
+.flow-designer-version-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.flow-designer-version-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.flow-designer-version-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+.flow-designer-version-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+.flow-designer-version-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+.flow-designer-version-changelog {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #4b5563;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  padding: 8px;
+}
+.flow-designer-small-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+.flow-designer-small-text-green {
+  font-size: 12px;
+  color: #059669;
+}
+.flow-designer-small-text-gray {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 8px;
+}
+.flow-designer-tag-success {
+  padding: 4px 8px;
+  background-color: #dcfce7;
+  color: #166534;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.flow-designer-tag-warning {
+  padding: 4px 8px;
+  background-color: #fef3c7;
+  color: #92400e;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.flow-designer-tag-error {
+  padding: 4px 8px;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.flow-designer-form-success {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f0fdf4;
+  border-radius: 8px;
+}
+.flow-designer-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.flow-designer-center-text {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}

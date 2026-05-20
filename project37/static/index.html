@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工考勤管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-radius: 12px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .stat-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .stat-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .clock-display {
+            font-size: 3rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        .btn-punch {
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .nav-item-role {
+            display: none;
+        }
+        #loginPage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+        }
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+        }
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="loginPage">
+        <div class="card login-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-building" style="font-size: 3rem; color: #667eea;"></i>
+                <h2 class="mt-3">员工考勤管理系统</h2>
+                <p class="text-muted">Attendance Management System</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">员工编号</label>
+                    <input type="text" class="form-control" id="employeeNo" placeholder="请输入员工编号" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-control" id="password" placeholder="请输入密码" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>登录
+                </button>
+            </form>
+            <div class="mt-4 text-center text-muted small">
+                <p class="mb-1">测试账号：</p>
+                <p class="mb-0">管理员: EMP001 / 123456</p>
+                <p class="mb-0">部门经理: EMP002 / 123456</p>
+                <p class="mb-0">普通员工: EMP003 / 123456</p>
+                <p>HR: EMP005 / 123456</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="mainApp" style="display: none;">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <nav class="col-md-2 d-md-block sidebar p-0">
+                    <div class="p-3 border-bottom border-white/20">
+                        <h5 class="mb-0"><i class="bi bi-building me-2"></i>考勤系统</h5>
+                    </div>
+                    <div class="p-3 border-bottom border-white/20">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar bg-white/20 rounded-circle p-2 me-2">
+                                <i class="bi bi-person"></i>
+                            </div>
+                            <div>
+                                <div id="userName" class="fw-bold"></div>
+                                <div id="userRole" class="small opacity-75"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nav flex-column mt-2" id="sidebarNav">
+                        <a class="nav-link active" data-page="dashboard">
+                            <i class="bi bi-speedometer2"></i>仪表盘
+                        </a>
+                        <a class="nav-link" data-page="attendance">
+                            <i class="bi bi-clock"></i>打卡管理
+                        </a>
+                        <a class="nav-link" data-page="leave">
+                            <i class="bi bi-calendar-x"></i>请假申请
+                        </a>
+                        <a class="nav-link nav-item-role manager hr admin" data-page="approval">
+                            <i class="bi bi-check2-square"></i>审批管理
+                        </a>
+                        <a class="nav-link" data-page="statistics">
+                            <i class="bi bi-bar-chart"></i>考勤统计
+                        </a>
+                        <a class="nav-link nav-item-role hr admin" data-page="employees">
+                            <i class="bi bi-people"></i>员工管理
+                        </a>
+                        <a class="nav-link nav-item-role admin" data-page="departments">
+                            <i class="bi bi-diagram-3"></i>部门管理
+                        </a>
+                        <a class="nav-link nav-item-role admin" data-page="system">
+                            <i class="bi bi-gear"></i>系统管理
+                        </a>
+                    </div>
+                    <div class="p-3 mt-auto">
+                        <button class="nav-link w-100 text-start" id="logoutBtn">
+                            <i class="bi bi-box-arrow-right"></i>退出登录
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- 主内容区 -->
+                <main class="col-md-10 ms-sm-auto px-md-4 py-4">
+                    <!-- 仪表盘页面 -->
+                    <div id="page-dashboard" class="page active">
+                        <h3 class="mb-4">仪表盘</h3>
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card stat-card p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="opacity-75 mb-1">今日打卡</h6>
+                                            <h3 id="todayStatus">未打卡</h3>
+                                        </div>
+                                        <i class="bi bi-clock" style="font-size: 2rem; opacity: 0.5;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card success p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="opacity-75 mb-1">本月出勤</h6>
+                                            <h3 id="monthAttendance">0天</h3>
+                                        </div>
+                                        <i class="bi bi-check-circle" style="font-size: 2rem; opacity: 0.5;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 nav-item-role manager hr admin">
+                                <div class="card stat-card warning p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="opacity-75 mb-1">待我审批</h6>
+                                            <h3 id="pendingApproval">0</h3>
+                                        </div>
+                                        <i class="bi bi-hourglass-split" style="font-size: 2rem; opacity: 0.5;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stat-card info p-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="opacity-75 mb-1">本月请假</h6>
+                                            <h3 id="monthLeave">0天</h3>
+                                        </div>
+                                        <i class="bi bi-calendar-x" style="font-size: 2rem; opacity: 0.5;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card p-4">
+                                    <h5 class="mb-3">最近打卡记录</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>日期</th>
+                                                    <th>上班时间</th>
+                                                    <th>下班时间</th>
+                                                    <th>状态</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recentRecords"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card p-4">
+                                    <h5 class="mb-3">我的请假申请</h5>
+                                    <div id="recentLeaves"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 打卡管理页面 -->
+                    <div id="page-attendance" class="page">
+                        <h3 class="mb-4">打卡管理</h3>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card p-5 text-center">
+                                    <div class="clock-display mb-4" id="clockDisplay">00:00:00</div>
+                                    <div class="text-muted mb-4" id="dateDisplay"></div>
+                                    <div class="mb-4">
+                                        <span class="badge bg-secondary me-2">上班 09:00</span>
+                                        <span class="badge bg-secondary">下班 18:00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button class="btn btn-primary btn-punch" id="clockInBtn">
+                                            <i class="bi bi-arrow-up-circle me-2"></i>上班打卡
+                                        </button>
+                                        <button class="btn btn-success btn-punch" id="clockOutBtn">
+                                            <i class="bi bi-arrow-down-circle me-2"></i>下班打卡
+                                        </button>
+                                    </div>
+                                    <div class="mt-4" id="todayPunchStatus"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card p-4">
+                                    <h5 class="mb-3">今日打卡状态</h5>
+                                    <div id="todayDetail"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card p-4">
+                            <h5 class="mb-3">打卡历史</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control" id="startDate">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control" id="endDate">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary" onclick="loadAttendanceHistory()">
+                                        <i class="bi bi-search me-2"></i>查询
+                                    </button>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button class="btn btn-success" onclick="exportPersonalAttendance()">
+                                        <i class="bi bi-download me-2"></i>导出CSV
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>日期</th>
+                                            <th>上班时间</th>
+                                            <th>下班时间</th>
+                                            <th>上班IP</th>
+                                            <th>下班IP</th>
+                                            <th>状态</th>
+                                            <th>迟到/早退分钟</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attendanceHistory"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 请假申请页面 -->
+                    <div id="page-leave" class="page">
+                        <h3 class="mb-4">请假申请</h3>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="card p-4">
+                                    <h5 class="mb-3">提交请假申请</h5>
+                                    <form id="leaveForm">
+                                        <div class="mb-3">
+                                            <label class="form-label">请假类型</label>
+                                            <select class="form-select" id="leaveType" required>
+                                                <option value="">请选择</option>
+                                                <option value="personal_leave">事假</option>
+                                                <option value="sick_leave">病假</option>
+                                                <option value="annual_leave">年假</option>
+                                                <option value="marriage_leave">婚假</option>
+                                                <option value="maternity_leave">产假</option>
+                                                <option value="bereavement_leave">丧假</option>
+                                                <option value="other">其他</option>
+                                            </select>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">开始时间</label>
+                                                <input type="datetime-local" class="form-control" id="leaveStart" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">结束时间</label>
+                                                <input type="datetime-local" class="form-control" id="leaveEnd" required>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">请假原因</label>
+                                            <textarea class="form-control" id="leaveReason" rows="3" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bi bi-send me-2"></i>提交申请
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card p-4">
+                                    <h5 class="mb-3">我的请假记录</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>类型</th>
+                                                    <th>开始时间</th>
+                                                    <th>结束时间</th>
+                                                    <th>天数</th>
+                                                    <th>状态</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="myLeaveRecords"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 审批管理页面 -->
+                    <div id="page-approval" class="page">
+                        <h3 class="mb-4">审批管理</h3>
+                        <div class="card p-4">
+                            <ul class="nav nav-tabs mb-3">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-tab="pending">待我审批</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-tab="history">审批历史</a>
+                                </li>
+                            </ul>
+                            <div id="tab-pending">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>申请人</th>
+                                                <th>部门</th>
+                                                <th>请假类型</th>
+                                                <th>开始时间</th>
+                                                <th>结束时间</th>
+                                                <th>天数</th>
+                                                <th>原因</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pendingApprovalList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div id="tab-history" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>申请人</th>
+                                                <th>请假类型</th>
+                                                <th>开始时间</th>
+                                                <th>结束时间</th>
+                                                <th>审批人</th>
+                                                <th>审批时间</th>
+                                                <th>状态</th>
+                                                <th>意见</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="approvalHistoryList"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 考勤统计页面 -->
+                    <div id="page-statistics" class="page">
+                        <h3 class="mb-4">考勤统计</h3>
+                        <div class="card p-4">
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label">月份</label>
+                                    <input type="month" class="form-control" id="statMonth">
+                                </div>
+                                <div class="col-md-3" id="deptSelectWrapper" style="display: none;">
+                                    <label class="form-label">部门</label>
+                                    <select class="form-select" id="statDept">
+                                        <option value="">全部部门</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div>
+                                        <button class="btn btn-primary" onclick="loadStatistics()">
+                                            <i class="bi bi-search me-2"></i>查询
+                                        </button>
+                                        <button class="btn btn-success ms-2" onclick="exportStatistics()">
+                                            <i class="bi bi-download me-2"></i>导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="personalStats" class="mb-4"></div>
+                            <div id="departmentStats" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 员工管理页面 -->
+                    <div id="page-employees" class="page">
+                        <h3 class="mb-4">员工管理</h3>
+                        <div class="card p-4">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="empSearch" placeholder="搜索员工">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="empDeptFilter">
+                                        <option value="">全部部门</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <button class="btn btn-primary" onclick="showEmployeeModal()">
+                                        <i class="bi bi-plus me-2"></i>添加员工
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>员工编号</th>
+                                            <th>姓名</th>
+                                            <th>部门</th>
+                                            <th>职位</th>
+                                            <th>角色</th>
+                                            <th>邮箱</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="employeeList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 部门管理页面 -->
+                    <div id="page-departments" class="page">
+                        <h3 class="mb-4">部门管理</h3>
+                        <div class="card p-4">
+                            <div class="row mb-3">
+                                <div class="col-md-9"></div>
+                                <div class="col-md-3 text-end">
+                                    <button class="btn btn-primary" onclick="showDepartmentModal()">
+                                        <i class="bi bi-plus me-2"></i>添加部门
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>部门名称</th>
+                                            <th>描述</th>
+                                            <th>创建时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="departmentList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 系统管理页面 -->
+                    <div id="page-system" class="page">
+                        <h3 class="mb-4">系统管理</h3>
+                        <div class="card p-4">
+                            <h5 class="mb-3">数据库备份</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary" onclick="createBackup()">
+                                        <i class="bi bi-save me-2"></i>创建备份
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>文件名</th>
+                                            <th>创建时间</th>
+                                            <th>大小</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="backupList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- 审批弹窗 -->
+    <div class="modal fade" id="approvalModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">审批请假申请</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="approvalId">
+                    <input type="hidden" id="approvalLevel">
+                    <h6 class="mb-3 text-primary">申请详情</h6>
+                    <div class="row mb-4 g-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">申请人</label>
+                            <div id="approvalEmployeeName" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">所属部门</label>
+                            <div id="approvalDeptName" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">请假类型</label>
+                            <div id="approvalLeaveType" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">请假天数</label>
+                            <div id="approvalLeaveDays" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">开始时间</label>
+                            <div id="approvalStartTime" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">结束时间</label>
+                            <div id="approvalEndTime" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted">请假原因</label>
+                            <div id="approvalReason" class="fw-bold">-</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted">当前审批级别</label>
+                            <div id="approvalCurrentLevel" class="fw-bold">-</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">审批意见 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="approvalComment" rows="3" placeholder="请输入审批意见..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" onclick="submitApproval('rejected')">拒绝</button>
+                    <button type="button" class="btn btn-success" onclick="submitApproval('approved')">通过</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 员工弹窗 -->
+    <div class="modal fade" id="employeeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="empModalTitle">添加员工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="employeeForm">
+                        <input type="hidden" id="empId">
+                        <div class="mb-3">
+                            <label class="form-label">员工编号</label>
+                            <input type="text" class="form-control" id="empNo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-control" id="empName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-control" id="empPassword">
+                            <small class="text-muted">修改时留空则不改变密码</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">部门</label>
+                            <select class="form-select" id="empDept"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">职位</label>
+                            <input type="text" class="form-control" id="empPosition">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">角色</label>
+                            <select class="form-select" id="empRole">
+                                <option value="employee">普通员工</option>
+                                <option value="department_manager">部门经理</option>
+                                <option value="hr">HR</option>
+                                <option value="admin">管理员</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="empEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">手机号</label>
+                            <input type="tel" class="form-control" id="empPhone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEmployee()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 部门弹窗 -->
+    <div class="modal fade" id="deptModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deptModalTitle">添加部门</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deptForm">
+                        <input type="hidden" id="deptId">
+                        <div class="mb-3">
+                            <label class="form-label">部门名称</label>
+                            <input type="text" class="form-control" id="deptName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" id="deptDesc" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDepartment()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">提示</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+.workbench-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.workbench-logo {
+  padding: 16px;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-bottom: 1px solid #374151;
+}
+.workbench-header {
+  background-color: white;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.workbench-header-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+.workbench-header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workbench-content {
+  padding: 24px;
+  background-color: #f9fafb;
+}
+.workbench-stats-row {
+  margin-bottom: 24px;
+}
+.workbench-template-card {
+  height: 100%;
+  transition: box-shadow 0.2s;
+}
+.workbench-template-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.workbench-template-icon {
+  text-align: center;
+}
+.workbench-template-icon-size {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+.workbench-template-name {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.workbench-template-desc {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+  min-height: 48px;
+}
+.workbench-detail-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+.workbench-detail-formdata {
+  font-size: 12px;
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 160px;
+}
+.workbench-log-item {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.workbench-log-item:last-child {
+  border-bottom: none;
+}
+.workbench-log-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.workbench-log-user {
+  font-weight: 500;
+}
+.workbench-log-time {
+  color: #6b7280;
+}
+.workbench-log-comment {
+  font-size: 14px;
+  margin-top: 4px;
+  color: #4b5563;
+}
+.workbench-log-empty {
+  color: #6b7280;
+  text-align: center;
+}

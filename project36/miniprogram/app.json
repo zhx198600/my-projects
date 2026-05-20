@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1677ff",
+    "navigationBarTitleText": "农民工上岗登记",
+    "navigationBarTextStyle": "white"
+  },
+  "sitemapLocation": "sitemap.json"
+}
