@@ -1,0 +1,139 @@
+<view class="detail-container {{isDarkMode ? 'dark-mode' : 'light-mode'}}" wx:if="{{!loading}}">
+  <view class="font-toolbar">
+    <view class="font-btn" bindtap="toggleFontSelector">
+      <text class="font-icon">A</text>
+      <text class="font-label">字体</text>
+    </view>
+  </view>
+
+  <view class="font-selector {{showFontSelector ? 'show' : ''}}" bindtap="toggleFontSelector">
+    <view class="font-selector-content" catchtap="stopTap">
+      <view class="font-selector-title">选择字体大小</view>
+      <view class="font-options">
+        <view 
+          class="font-option {{fontSizeLevel === item.key ? 'active' : ''}}" 
+          wx:for="{{fontSizeOptions}}" 
+          wx:key="key"
+          data-level="{{item.key}}"
+          bindtap="selectFontSize"
+        >
+          <text class="option-text" style="font-size: {{item.key === 'small' ? '24' : item.key === 'medium' ? '28' : item.key === 'large' ? '32' : '36'}}rpx;">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="detail-scroll" scroll-y="true">
+    <view class="detail-header">
+      <view class="detail-title font-{{fontSizeLevel}}">{{news.title}}</view>
+      <view class="detail-meta">
+        <text class="meta-source">{{news.source}}</text>
+        <text class="meta-time">{{news.publishTime}}</text>
+      </view>
+    </view>
+
+    <view class="detail-cover" wx:if="{{news.coverImage}}">
+      <image src="{{news.coverImage}}" mode="aspectFill"></image>
+    </view>
+
+    <view class="detail-content font-{{fontSizeLevel}}">
+      <rich-text nodes="{{news.content}}"></rich-text>
+    </view>
+
+    <view class="comment-section">
+      <view class="section-header">
+        <text class="section-title">评论 ({{commentCount}})</text>
+      </view>
+
+      <view class="comment-list" wx:if="{{comments.length > 0}}">
+        <view 
+          class="comment-item" 
+          wx:for="{{comments}}" 
+          wx:key="id"
+        >
+          <view class="comment-avatar">
+            <text class="avatar-text">{{item.nickname.charAt(0)}}</text>
+          </view>
+          <view class="comment-content">
+            <view class="comment-header">
+              <text class="comment-nickname">{{item.nickname}}</text>
+              <text class="comment-time">{{formatTime(item.createTime)}}</text>
+            </view>
+            <view class="comment-text">{{item.content}}</view>
+            <view class="comment-actions">
+              <view class="action-btn" bindtap="replyToComment" data-comment="{{item}}">
+                <text class="action-icon">💬</text>
+                <text class="action-text">回复</text>
+              </view>
+              <view class="action-btn" bindtap="deleteComment" data-id="{{item.id}}">
+                <text class="action-icon">🗑️</text>
+                <text class="action-text">删除</text>
+              </view>
+            </view>
+            
+            <view class="reply-list" wx:if="{{item.replies && item.replies.length > 0}}">
+              <view 
+                class="reply-item" 
+                wx:for="{{item.replies}}" 
+                wx:for-item="reply"
+                wx:key="id"
+              >
+                <text class="reply-nickname">{{reply.nickname}}</text>
+                <text wx:if="{{reply.replyToName}}" class="reply-to">回复 {{reply.replyToName}}:</text>
+                <text class="reply-content">{{reply.content}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-comments" wx:else>
+        <text class="empty-icon">💬</text>
+        <text class="empty-text">暂无评论，快来抢沙发吧~</text>
+      </view>
+
+      <view class="detail-bottom-space"></view>
+    </view>
+  </scroll-view>
+
+  <view class="comment-input-bar">
+    <input 
+      class="comment-input" 
+      placeholder="{{replyTo ? '回复 ' + replyTo.nickname : '写下你的评论...'}}" 
+      value="{{commentText}}"
+      bindinput="onCommentInput"
+      confirm-type="send"
+      bindconfirm="submitComment"
+      focus="{{showCommentInput}}"
+    />
+    <view class="reply-cancel" wx:if="{{replyTo}}" bindtap="cancelReply">
+      <text>取消回复</text>
+    </view>
+    <view class="send-btn {{commentText ? 'active' : ''}}" bindtap="submitComment">
+      <text>发送</text>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <view class="bar-btn back-btn" bindtap="goBack">
+      <text class="btn-icon">←</text>
+      <text class="btn-text">返回</text>
+    </view>
+    <view class="bar-btn like-btn {{isLiked ? 'liked' : ''}}" bindtap="toggleLike">
+      <text class="btn-icon">{{isLiked ? '👍' : '👍'}}</text>
+      <text class="btn-text">{{isLiked ? '已赞' : '点赞'}}</text>
+    </view>
+    <view class="bar-btn comment-btn" bindtap="focusCommentInput">
+      <text class="btn-icon">💬</text>
+      <text class="btn-text">评论 ({{commentCount}})</text>
+    </view>
+    <view class="bar-btn favorite-btn {{isFavorite ? 'favorited' : ''}}" bindtap="toggleFavorite">
+      <text class="btn-icon">{{isFavorite ? '★' : '☆'}}</text>
+      <text class="btn-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
+    </view>
+  </view>
+</view>
+
+<view class="loading-container" wx:else>
+  <view class="loading-text">加载中...</view>
+</view>

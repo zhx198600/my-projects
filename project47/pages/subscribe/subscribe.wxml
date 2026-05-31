@@ -1,0 +1,93 @@
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view wx:if="{{!showNewsList}}">
+    <view class="header">
+      <text class="title">我的订阅</text>
+      <view class="add-btn" bindtap="showAddDialog">
+        <text class="add-icon">+</text>
+      </view>
+    </view>
+
+    <view class="keyword-count">
+      <text>已订阅 {{keywords.length}}/{{maxKeywords}} 个关键词</text>
+    </view>
+
+    <view class="keywords-grid">
+      <view 
+        class="keyword-item" 
+        wx:for="{{keywords}}" 
+        wx:key="*this"
+        bindtap="tapKeyword"
+        data-keyword="{{item}}"
+      >
+        <text class="keyword-text">{{item}}</text>
+        <view class="delete-btn" catchtap="removeKeyword" data-keyword="{{item}}">
+          <text class="delete-icon">×</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{keywords.length === 0}}">
+      <text class="empty-icon">🔖</text>
+      <text class="empty-text">暂无订阅关键词</text>
+      <text class="empty-desc">点击右上角添加订阅关键词</text>
+    </view>
+  </view>
+
+  <view wx:else>
+    <view class="news-header">
+      <view class="back-btn" bindtap="backToKeywords">
+        <text class="back-icon">←</text>
+        <text class="back-text">返回</text>
+      </view>
+      <text class="news-title">「{{selectedKeyword}}」相关新闻</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading-container">
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <view wx:elif="{{newsList.length === 0}}" class="empty-tip">
+      <text class="empty-text">暂无相关新闻</text>
+    </view>
+
+    <view wx:else class="news-list">
+      <view 
+        class="news-item" 
+        wx:for="{{newsList}}" 
+        wx:key="id"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="news-content">
+          <text class="news-title-text">{{item.title}}</text>
+          <view class="news-meta">
+            <text class="news-source">{{item.source}}</text>
+            <text class="news-time">{{item.publishTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="dialog-mask {{showAddDialog ? 'show' : ''}}" bindtap="hideAddDialog">
+    <view class="dialog-content" catchtap="stopDialogTap">
+      <view class="dialog-title">添加订阅关键词</view>
+      <input 
+        class="dialog-input" 
+        placeholder="请输入关键词" 
+        value="{{newKeyword}}"
+        bindinput="onKeywordInput"
+        maxlength="20"
+        focus="{{showAddDialog}}"
+      />
+      <view class="dialog-actions">
+        <view class="dialog-btn cancel-btn" bindtap="hideAddDialog">
+          <text>取消</text>
+        </view>
+        <view class="dialog-btn confirm-btn" bindtap="addKeyword">
+          <text>确定</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

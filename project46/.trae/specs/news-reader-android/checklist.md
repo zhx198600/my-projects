@@ -1,0 +1,24 @@
+# 新闻阅读安卓应用 - Verification Checklist
+
+- [ ] Checkpoint 1: 项目可在 Android Studio 中成功 Sync，`./gradlew :app:assembleDebug` 构建成功生成 APK。
+- [ ] Checkpoint 2: 应用冷启动无崩溃，主界面显示四个底部 Tab（首页/推荐/订阅/我的）。
+- [ ] Checkpoint 3: 首页顶部至少展示 6 个分类 Tab（科技/财经/体育/娱乐/国际/社会），点击可切换对应新闻列表。
+- [ ] Checkpoint 4: 点击任意新闻条目可进入详情页，展示标题、作者、时间、正文、图片。
+- [ ] Checkpoint 5: 详情页可通过返回按钮回到上一级页面。
+- [ ] Checkpoint 6: 详情页收藏按钮点击后状态切换，对应新闻在"我的 > 收藏"中可见。
+- [ ] Checkpoint 7: 阅读完一篇新闻返回后，该新闻出现在"我的 > 历史"中，按时间倒序排列。
+- [ ] Checkpoint 8: 历史列表支持清空操作，清空后列表为空。
+- [ ] Checkpoint 9: 在详情页停留 ≥ 3 秒后，该条新闻的阅读时长被累计记录。
+- [ ] Checkpoint 10: "我的 > 阅读统计"可显示当天与当周累计阅读时长，数值与明细一致。
+- [ ] Checkpoint 11: "订阅"页面可添加/删除关键词，数据持久化保存。
+- [ ] Checkpoint 12: 首页列表中命中订阅关键词的新闻被高亮/置顶展示。
+- [ ] Checkpoint 13: "我的 > 夜间模式"切换为"夜间"后全应用立即变为深色主题，重启后设置保持。
+- [ ] Checkpoint 14: "我的 > 夜间模式"切换为"日间"后全应用立即变为浅色主题。
+- [ ] Checkpoint 15: "我的 > 内容过滤"添加屏蔽关键词后，包含该关键词的新闻在首页与推荐页中均不出现。
+- [ ] Checkpoint 16: 内容过滤支持屏蔽整个分类。
+- [ ] Checkpoint 17: "推荐" Tab 中展示基于用户行为（阅读/收藏/订阅）加权排序的新闻列表。
+- [ ] Checkpoint 18: 被屏蔽的内容不出现在推荐列表中。
+- [ ] Checkpoint 19: 底部 Tab 切换时保持当前页面滚动位置或状态。
+- [ ] Checkpoint 20: 关键 ViewModel 与 UseCase 具备单元测试并全部通过（`./gradlew test`）。
+- [ ] Checkpoint 21: `./gradlew lint` 无严重错误或警告。
+- [ ] Checkpoint 22: 应用在 API 24 及以上设备可正常运行。

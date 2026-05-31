@@ -1,6 +1,6 @@
 # 发票管理系统 - 实施计划（分解和优先级任务列表）
 
-## [/] Task 1: 项目初始化与数据库设计
+## [x] Task 1: 项目初始化与数据库设计
 - **Priority**: P0
 - **Depends On**: None
 - **Description**: 
@@ -15,7 +15,7 @@
   - `programmatic` TR-1.3: Vue前端项目可正常启动
 - **Notes**: 发票表需包含：id、发票号码、发票代码、开票日期、金额、税额、价税合计、销售方名称、销售方税号、购买方名称、购买方税号、发票类型、状态、创建时间、更新时间、文件路径等字段
 
-## [ ] Task 2: 发票文件上传接口实现
+## [x] Task 2: 发票文件上传接口实现
 - **Priority**: P0
 - **Depends On**: Task 1
 - **Description**: 
@@ -30,7 +30,7 @@
   - `programmatic` TR-2.3: 不支持的文件格式被拒绝
   - `human-judgement` TR-2.4: 前端上传组件UI友好，显示上传进度
 
-## [ ] Task 3: OCR发票识别功能实现
+## [x] Task 3: OCR发票识别功能实现
 - **Priority**: P0
 - **Depends On**: Task 2
 - **Description**: 
@@ -45,7 +45,7 @@
   - `human-judgement` TR-3.3: 识别结果展示清晰，支持手动编辑修正
   - `programmatic` TR-3.4: PDF文件可正常转换为图片并识别
 
-## [ ] Task 4: 发票数据CRUD接口实现
+## [x] Task 4: 发票数据CRUD接口实现
 - **Priority**: P0
 - **Depends On**: Task 1
 - **Description**: 
@@ -62,7 +62,7 @@
   - `programmatic` TR-4.4: PUT /api/invoices/:id 成功更新发票数据
   - `programmatic` TR-4.5: DELETE /api/invoices/:id 成功删除发票记录
 
-## [ ] Task 5: 自动查重功能实现
+## [x] Task 5: 自动查重功能实现
 - **Priority**: P0
 - **Depends On**: Task 4
 - **Description**: 
@@ -76,7 +76,7 @@
   - `programmatic` TR-5.2: 不重复的发票可以正常创建
   - `human-judgement` TR-5.3: 前端查重提示友好，用户可清晰理解
 
-## [ ] Task 6: 手动开具发票功能实现
+## [x] Task 6: 手动开具发票功能实现
 - **Priority**: P0
 - **Depends On**: Task 4
 - **Description**: 
@@ -91,7 +91,7 @@
   - `programmatic` TR-6.3: 开具的发票数据成功保存到数据库
   - `human-judgement` TR-6.4: 表单布局合理，用户体验良好
 
-## [ ] Task 7: 发票列表与搜索功能实现
+## [x] Task 7: 发票列表与搜索功能实现
 - **Priority**: P1
 - **Depends On**: Task 4
 - **Description**: 
@@ -106,7 +106,7 @@
   - `programmatic` TR-7.3: 按日期范围筛选返回正确结果
   - `human-judgement` TR-7.4: 列表页面布局美观，信息展示清晰
 
-## [ ] Task 8: 发票数据导出功能实现
+## [x] Task 8: 发票数据导出功能实现
 - **Priority**: P1
 - **Depends On**: Task 4
 - **Description**: 
@@ -121,7 +121,7 @@
   - `programmatic` TR-8.3: 可选择部分发票进行导出
   - `human-judgement` TR-8.4: 导出过程有进度提示，用户体验良好
 
-## [ ] Task 9: 前端页面整合与优化
+## [x] Task 9: 前端页面整合与优化
 - **Priority**: P1
 - **Depends On**: Task 2, Task 6, Task 7
 - **Description**: 
@@ -136,7 +136,7 @@
   - `human-judgement` TR-9.3: 在不同屏幕尺寸下布局正常
   - `programmatic` TR-9.4: 错误提示正确显示
 
-## [ ] Task 10: 数据备份与恢复功能
+## [x] Task 10: 数据备份与恢复功能
 - **Priority**: P2
 - **Depends On**: Task 1
 - **Description**: 
@@ -149,7 +149,7 @@
   - `programmatic` TR-10.2: 恢复功能可从备份文件恢复数据
   - `human-judgement` TR-10.3: 备份恢复操作有确认提示，防止误操作
 
-## [ ] Task 11: 系统测试与Bug修复
+## [x] Task 11: 系统测试与Bug修复
 - **Priority**: P1
 - **Depends On**: Task 1-10
 - **Description**: 

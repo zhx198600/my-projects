@@ -1,0 +1,85 @@
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索新闻" 
+        value="{{keyword}}"
+        bindinput="onInput"
+        confirm-type="search"
+        bindconfirm="onSearch"
+        focus="true"
+      />
+      <text class="clear-icon" wx:if="{{keyword}}" catchtap="clearInput">×</text>
+    </view>
+    <text class="cancel-btn" catchtap="goBack">取消</text>
+  </view>
+
+  <view class="search-history" wx:if="{{!showResults && searchHistory.length > 0}}">
+    <view class="history-header">
+      <text class="history-title">搜索历史</text>
+      <text class="clear-history" bindtap="clearSearchHistory">清空</text>
+    </view>
+    <view class="history-list">
+      <view 
+        class="history-item" 
+        wx:for="{{searchHistory}}" 
+        wx:key="*this"
+        data-keyword="{{item}}"
+        bindtap="onHistoryTap"
+      >
+        <text class="history-icon">🕐</text>
+        <text class="history-text">{{item}}</text>
+        <text class="remove-history" catchtap="removeHistoryItem" data-keyword="{{item}}">×</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-results" wx:if="{{showResults}}">
+    <view class="results-header" wx:if="{{searchResults.length > 0}}">
+      <text class="results-count">找到 {{searchResults.length}} 条相关新闻</text>
+    </view>
+
+    <view class="news-list" wx:if="{{searchResults.length > 0}}">
+      <view 
+        class="news-item" 
+        wx:for="{{searchResults}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onNewsTap"
+      >
+        <view class="news-cover">
+          <image src="{{item.coverImage}}" mode="aspectFill"></image>
+        </view>
+        <view class="news-content">
+          <view class="news-title">{{item.title}}</view>
+          <view class="news-summary">{{item.summary}}</view>
+          <view class="news-meta">
+            <text class="meta-source">{{item.source}}</text>
+            <text class="meta-time">{{item.publishTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{!hasMore && searchResults.length > 0}}">
+      <text>没有更多了</text>
+    </view>
+
+    <view class="empty-state" wx:if="{{searchResults.length === 0 && !loading}}">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">未找到相关新闻</text>
+      <text class="empty-desc">试试其他关键词吧</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{!showResults && searchHistory.length === 0}}">
+    <text class="empty-icon">📰</text>
+    <text class="empty-text">输入关键词搜索新闻</text>
+  </view>
+</view>

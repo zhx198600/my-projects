@@ -1,0 +1,3 @@
+#!/bin/sh
+exec java -version 2>/dev/null || { echo "Java not found"; exit 1; }
+echo "Gradle wrapper placeholder - run with Android Studio or ./gradlew from Android Studio project"

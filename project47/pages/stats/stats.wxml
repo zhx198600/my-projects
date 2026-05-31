@@ -1,0 +1,85 @@
+<view class="container {{isDarkMode ? 'dark-mode' : 'light-mode'}}">
+  <view class="header-card">
+    <view class="header-title">阅读统计</view>
+    <view class="header-desc">记录你的每一次阅读</view>
+  </view>
+
+  <view class="total-card">
+    <view class="total-item">
+      <view class="total-value">{{formatDuration(totalDuration)}}</view>
+      <view class="total-label">累计阅读时长</view>
+    </view>
+    <view class="total-divider"></view>
+    <view class="total-item">
+      <view class="total-value">{{totalCount}}</view>
+      <view class="total-label">累计阅读篇数</view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="section-title">今日阅读</view>
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-icon">⏱️</view>
+        <view class="stat-info">
+          <view class="stat-value">{{formatDuration(stats.today.duration)}}</view>
+          <view class="stat-label">阅读时长</view>
+        </view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-icon">📄</view>
+        <view class="stat-info">
+          <view class="stat-value">{{stats.today.count}}</view>
+          <view class="stat-label">阅读篇数</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="section-title">本周阅读</view>
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-icon">⏱️</view>
+        <view class="stat-info">
+          <view class="stat-value">{{formatDuration(stats.week.duration)}}</view>
+          <view class="stat-label">阅读时长</view>
+        </view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-icon">📄</view>
+        <view class="stat-info">
+          <view class="stat-value">{{stats.week.count}}</view>
+          <view class="stat-label">阅读篇数</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="section-title">本月阅读</view>
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-icon">⏱️</view>
+        <view class="stat-info">
+          <view class="stat-value">{{formatDuration(stats.month.duration)}}</view>
+          <view class="stat-label">阅读时长</view>
+        </view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-icon">📄</view>
+        <view class="stat-info">
+          <view class="stat-value">{{stats.month.count}}</view>
+          <view class="stat-label">阅读篇数</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tips-card">
+    <view class="tips-title">💡 阅读小贴士</view>
+    <view class="tips-content">
+      <text>每天坚持阅读30分钟，有助于提升知识储备和思维能力。</text>
+    </view>
+  </view>
+</view>
